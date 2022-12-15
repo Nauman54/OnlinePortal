@@ -1,0 +1,57 @@
+﻿@page "/Department/department"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+
+<h3>Departments</h3>
+
+<a href="/Department/addnewdepartment" class="btn btn-primary btn-sm">Add New</a>
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Name</th>
+			<th>Organization</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in deptData)
+	{
+		<tr>
+			<td>@item.DeptID</td>
+			<td>@item.DeptName</td>
+			<td>@item.OrgID</td>
+			<td>
+				<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteDept(item.OrgID))">
+					Delete
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code {
+
+	private List<DeptModel> deptData { get; set; } = new List<DeptModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadDept();
+	}
+
+	private void LoadDept()
+	{
+		deptData = DeptDAL.GetDept();
+	}
+
+	private void DeleteDept(int DeptID)
+	{
+		int i = DeptDAL.DeleteOrg(DeptID);
+		if (i == 1)
+		{
+			LoadDept();
+		}
+	}
+
+}

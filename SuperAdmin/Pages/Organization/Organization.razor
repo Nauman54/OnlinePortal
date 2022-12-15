@@ -1,0 +1,63 @@
+﻿@page "/Organization/organization"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+
+<h3>Organizations</h3>
+
+
+<a href="/Organization/addneworg" class="btn btn-primary btn-sm">Add New</a>
+
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Name</th>
+			<th>Address</th>
+			<th>Phone No</th>
+			<th>Email</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in orgData)
+	{
+		<tr>
+			<td>@item.OrgID</td>
+			<td>@item.OrgName</td>
+			<td>@item.OrgAddress</td>
+			<td>@item.OrgPhoneNo</td>
+			<td>@item.OrgEmail</td>
+			<td>
+				<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteOrg(item.OrgID))">
+					Delete
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code {
+
+	private List<OrgModel> orgData { get; set; } = new List<OrgModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadOrg();
+	}
+
+	private void LoadOrg()
+	{
+		orgData = OrgDAL.GetOrg();
+	}
+
+	private void DeleteOrg(int OrgID)
+	{
+		int i = OrgDAL.DeleteOrg(OrgID);
+		if (i == 1)
+		{
+			LoadOrg();
+		}
+	}
+
+}

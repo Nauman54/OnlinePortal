@@ -1,0 +1,38 @@
+﻿@page "/Organization/addneworg"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+
+<h3>Add New Organization</h3>
+
+<EditForm Model="orgModel" OnSubmit="SaveOrg">
+
+	<input type="text" @bind-value="orgModel.OrgName" placeholder="Enter Organization Name" />
+	<br />
+	<input type="text" @bind-value="orgModel.OrgAddress" placeholder="Enter Address" />
+	<br />
+	<input type="text" @bind-value="orgModel.OrgPhoneNo" placeholder="Enter Phone Number" />
+	<br />
+	<input type="text" @bind-value="orgModel.OrgEmail" placeholder="Enter Email" />
+	<br />
+	<br />
+	<button type="submit">Save</button>
+
+</EditForm>
+<br />
+<p>@msg</p>
+
+@code {
+
+
+	private OrgModel orgModel { get; set; } = new OrgModel();
+	private string? msg { get; set; }
+	private void SaveOrg()
+	{
+		int i = OrgDAL.SaveOrg(orgModel);
+		if (i == 1)
+		{
+			msg = "Saved";
+		}
+	}
+
+}
