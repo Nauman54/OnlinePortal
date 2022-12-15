@@ -1,4 +1,4 @@
-﻿@page "/Department/addnewdepartment"
+﻿@page "/Department/addnewdepartment/{OrgID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 
@@ -8,8 +8,8 @@
 
 	<input type="text" @bind-value="deptModel.DeptName" placeholder="Enter Department Name" />
 	<br />
-	<input type="text" @bind-value="deptModel.OrgID" placeholder="Enter Organization ID" />
-	<br />
+	@*<input type="text" @bind-value="deptModel.OrgID" placeholder="Enter Organization ID" />
+	<br />*@
 	<br />
 	<button type="submit">Save</button>
 
@@ -18,12 +18,14 @@
 <p>@msg</p>
 
 @code {
-
+	[Parameter]
+	public string? OrgID { get; set; }
 	private DeptModel deptModel { get; set; } = new DeptModel();
 	private string? msg { get; set; }
 
 	private void SaveDept()
 	{
+		deptModel.OrgID = int.Parse(OrgID);
 		int i = DeptDAL.SaveDept(deptModel);
 		if (i == 1)
 		{
