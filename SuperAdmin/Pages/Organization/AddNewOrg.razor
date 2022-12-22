@@ -1,9 +1,10 @@
-﻿@page "/Organization/addneworg"
+﻿@page "/org/addneworg"
 @using ClassLibraryModel
 @using ClassLibraryDAL
+@inject NavigationManager nm
 
 <h3>Add New Organization</h3>
-
+<br />
 <EditForm Model="orgModel" OnSubmit="SaveOrg">
 
 	<input type="text" @bind-value="orgModel.OrgName" placeholder="Enter Organization Name" />
@@ -15,23 +16,20 @@
 	<input type="text" @bind-value="orgModel.OrgEmail" placeholder="Enter Email" />
 	<br />
 	<br />
-	<button type="submit">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
 
 </EditForm>
 <br />
-<p>@msg</p>
 
 @code {
 
-
 	private OrgModel orgModel { get; set; } = new OrgModel();
-	private string? msg { get; set; }
 	private void SaveOrg()
 	{
-		int i = OrgDAL.SaveOrg(orgModel);
-		if (i == 1)
+
+		if (OrgDAL.SaveOrg(orgModel)==1)
 		{
-			msg = "Saved";
+			nm.NavigateTo("org/organizations");
 		}
 	}
 

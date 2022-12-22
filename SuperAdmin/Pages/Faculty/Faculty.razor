@@ -1,63 +1,73 @@
-﻿@page "/Faculty/faculty"
+﻿@page "/facl/faculty"
+@using ClassLibraryDAL
+@using ClassLibraryModel
 
 <h3>Faculty</h3>
 
-
-<a href="/Faculty/addnewfaculty" class="btn btn-primary btn-sm">Add New Faculty</a>
-
+<br />
+<a href="dept/department" class="btn btn-outline-primary btn-sm">Add New Faculty</a>
+<br />
+<br />
 <table class="table table-bordered">
-	<tr>
-		<td>1</td>
-		<td>Dr Ashfaq Hussain Farooqi</td>
-		<td>
-			<a href="student/1" class="btn btn-primary btn-sm">View Students</a>
-			<a href="/deletefac" class="btn btn-primary btn-sm">Delete</a>
-			<a href="/updatefac" class="btn btn-primary btn-sm">Update</a>
-		</td>
-	</tr>
-
-	<tr>
-		<td>2</td>
-		<td>Mr Junaid Nazar</td>
-		<td>
-			<a href="student/1" class="btn btn-primary btn-sm">View Students</a>
-			<a href="/deletefac" class="btn btn-primary btn-sm">Delete</a>
-			<a href="/updatefac" class="btn btn-primary btn-sm">Update</a>
-		</td>
-	</tr>
-
-	<tr>
-		<td>3</td>
-		<td>Mr Asim Ali</td>
-		<td>
-			<a href="student/1" class="btn btn-primary btn-sm">View Students</a>
-			<a href="/deletefac" class="btn btn-primary btn-sm">Delete</a>
-			<a href="/updatefac" class="btn btn-primary btn-sm">Update</a>
-		</td>
-	</tr>
-
-	<tr>
-		<td>4</td>
-		<td>Ms Hina Nasir</td>
-		<td>
-			<a href="student/1" class="btn btn-primary btn-sm">View Students</a>
-			<a href="/deletefac" class="btn btn-primary btn-sm">Delete</a>
-			<a href="/updatefac" class="btn btn-primary btn-sm">Update</a>
-		</td>
-	</tr>
-
-	<tr>
-		<td>5</td>
-		<td>Ms Qanetah Ahmad</td>
-		<td>
-			<a href="student/1" class="btn btn-primary btn-sm">View Students</a>
-			<a href="/deletefac" class="btn btn-primary btn-sm">Delete</a>
-			<a href="/updatefac" class="btn btn-primary btn-sm">Update</a>
-		</td>
-	</tr>
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>First Name</th>
+			<th>Last Name</th>
+			<th>Phone No</th>
+			<th>Email</th>
+			<th>Address</th>
+			<th>Position</th>
+			<th>Expertise</th>
+			<th>Qualification</th>
+			<th>Department</th>
+			<th>Organization</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in faclData)
+	{
+			<tr>
+				<td>@item.FaclID</td>
+				<td>@item.FaclFirstName</td>
+				<td>@item.FaclLastName</td>
+				<td>@item.FaclPhoneNo</td>
+				<td>@item.FaclEmail</td>
+				<td>@item.FaclAddress</td>
+				<td>@item.PosID</td>
+				<td>@item.ExpID</td>
+				<td>@item.QualID</td>
+				<td>@item.DeptID</td>
+				<td>@item.OrgID</td>
+				<td>
+					<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteOrg(item.FaclID))">
+						Delete
+					</button>
+				</td>
+			</tr>
+	}
 </table>
 
-
 @code {
+	private List<FaclModel> faclData { get; set; } = new List<FaclModel>();
 
+	protected override void OnInitialized()
+	{
+		LoadFacl();
+	}
+
+	private void LoadFacl()
+	{
+		faclData = FaclDAL.GetFacl();
+	}
+
+	private void DeleteOrg(int FaclID)
+	{
+		int i = FaclDAL.DeleteFacl(FaclID);
+		if (i == 1)
+		{
+			LoadFacl();
+		}
+	}
 }

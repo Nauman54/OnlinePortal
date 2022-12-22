@@ -1,13 +1,13 @@
-﻿@page "/Organization/organization"
+﻿@page "/org/organizations"
 @using ClassLibraryDAL
 @using ClassLibraryModel
 
 <h3>Organizations</h3>
 
-
-<a href="/Organization/addneworg" class="btn btn-primary btn-sm">Add New</a>
-
-
+<br />
+<a href="org/addneworg" class="btn btn-outline-primary btn-sm">Add New Organization</a>
+<br />
+<br />
 <table class="table table-bordered">
 	<thead>
 		<tr>
@@ -32,9 +32,7 @@
 					@onclick="(()=>DeleteOrg(item.OrgID))">
 					Delete
 				</button>
-			</td>
-			<td>
-				<a href="Department/addnewdepartment/@item.OrgID">Add depart</a>
+				<a href="dept/addnewdepartment/@item.OrgID" class="btn btn-outline-primary btn-sm">Add Department</a>
 			</td>
 		</tr>
 	}
@@ -56,8 +54,7 @@
 
 	private void DeleteOrg(int OrgID)
 	{
-		int i = OrgDAL.DeleteOrg(OrgID);
-		if (i == 1)
+		if (OrgDAL.DeleteOrg(OrgID) == 1)
 		{
 			LoadOrg();
 		}

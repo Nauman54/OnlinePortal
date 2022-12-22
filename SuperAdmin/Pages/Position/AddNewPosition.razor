@@ -1,0 +1,29 @@
+﻿@page "/pos/addnewpos"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+@inject NavigationManager nm
+
+<h3>AddNewPosition</h3>
+
+<br />
+<EditForm Model="posModel" OnSubmit="SavePos">
+
+	<input type="text" @bind-value="posModel.PosTitle" placeholder="Enter Position Title" />
+	<br />
+	<br />
+	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+
+</EditForm>
+<br />
+
+@code {
+	private PosModel posModel { get; set; } = new PosModel();
+	private void SavePos()
+	{
+
+		if (PosDAL.SavePos(posModel) == 1)
+		{
+			nm.NavigateTo("pos/positions");
+		}
+	}
+}

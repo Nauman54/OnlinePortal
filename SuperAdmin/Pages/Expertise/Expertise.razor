@@ -1,0 +1,57 @@
+﻿@page "/exp/expertise"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+
+<h3>Expertise</h3>
+<br />
+<a href="exp/addnewexp" class="btn btn-outline-primary btn-sm">Add New Expertise</a>
+<br />
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Title</th>
+			<th>Abbreviation</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in expData)
+	{
+		<tr>
+			<td>@item.ExpID</td>
+			<td>@item.ExpTitle</td>
+			<td>@item.Abbreviation</td>
+			<td>
+				<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteExp(item.ExpID))">
+					Delete
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code {
+	private List<ExpModel> expData { get; set; } = new List<ExpModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadExp();
+	}
+
+	private void LoadExp()
+	{
+		expData = ExpDAL.GetExp();
+	}
+
+	private void DeleteExp(int ExpID)
+	{
+		int i = ExpDAL.DeleteExp(ExpID);
+		if (i == 1)
+		{
+			LoadExp();
+		}
+	}
+}

@@ -8,50 +8,49 @@ using ClassLibraryModel;
 
 namespace ClassLibraryDAL
 {
-	public class DeptDAL
+	public class ExpDAL
 	{
-		public static int SaveDept(DeptModel dm)
+		public static int SaveExp(ExpModel em)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_SaveDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_SaveExp", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptName", dm.DeptName);
-			cmd.Parameters.AddWithValue("@OrgID", dm.OrgID);
+			cmd.Parameters.AddWithValue("@ExpTitle", em.ExpTitle);
+			cmd.Parameters.AddWithValue("@Abbreviation", em.Abbreviation);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
 		}
 
-		public static List<DeptModel> GetDept()
+		public static List<ExpModel> GetExp()
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_GetDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_GetExp", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 			SqlDataReader sdr = cmd.ExecuteReader();
-			List<DeptModel> Deptlist = new List<DeptModel>();
+			List<ExpModel> Explist = new List<ExpModel>();
 			while (sdr.Read())
 			{
-				DeptModel dept = new DeptModel();
-				dept.DeptID = int.Parse(sdr["DeptID"].ToString());
-				dept.DeptName = sdr["DeptName"].ToString();
-				dept.OrgID = int.Parse(sdr["OrgID"].ToString());
-				Deptlist.Add(dept);
+				ExpModel exp = new ExpModel();
+				exp.ExpID = int.Parse(sdr["ExpID"].ToString());
+				exp.ExpTitle = sdr["ExpTitle"].ToString();
+				exp.Abbreviation = sdr["Abbreviation"].ToString();
+				Explist.Add(exp);
 			}
-
 			con.Close();
-			return Deptlist;
+			return Explist;
 		}
 
-		public static int DeleteDept(int DeptID)
+		public static int DeleteExp(int ExpID)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_DeleteDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_DeleteExp", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptID", DeptID);
+			cmd.Parameters.AddWithValue("@ExpID", ExpID);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

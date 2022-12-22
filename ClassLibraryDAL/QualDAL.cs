@@ -8,50 +8,47 @@ using ClassLibraryModel;
 
 namespace ClassLibraryDAL
 {
-	public class DeptDAL
+	public class QualDAL
 	{
-		public static int SaveDept(DeptModel dm)
+		public static int SaveQual(QualModel qm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_SaveDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_SaveQual", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptName", dm.DeptName);
-			cmd.Parameters.AddWithValue("@OrgID", dm.OrgID);
+			cmd.Parameters.AddWithValue("@QualTitle", qm.QualTitle);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
 		}
 
-		public static List<DeptModel> GetDept()
+		public static List<QualModel> GetQual()
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_GetDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_GetQual", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 			SqlDataReader sdr = cmd.ExecuteReader();
-			List<DeptModel> Deptlist = new List<DeptModel>();
+			List<QualModel> Quallist = new List<QualModel>();
 			while (sdr.Read())
 			{
-				DeptModel dept = new DeptModel();
-				dept.DeptID = int.Parse(sdr["DeptID"].ToString());
-				dept.DeptName = sdr["DeptName"].ToString();
-				dept.OrgID = int.Parse(sdr["OrgID"].ToString());
-				Deptlist.Add(dept);
+				QualModel qual = new QualModel();
+				qual.QualID = int.Parse(sdr["QualID"].ToString());
+				qual.QualTitle = sdr["QualTitle"].ToString();
+				Quallist.Add(qual);
 			}
-
 			con.Close();
-			return Deptlist;
+			return Quallist;
 		}
 
-		public static int DeleteDept(int DeptID)
+		public static int DeleteQual(int QualID)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_DeleteDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_DeleteQual", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptID", DeptID);
+			cmd.Parameters.AddWithValue("@QualID", QualID);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

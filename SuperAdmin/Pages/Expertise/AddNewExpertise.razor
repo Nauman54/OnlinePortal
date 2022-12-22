@@ -1,0 +1,31 @@
+﻿@page "/exp/addnewexp"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+@inject NavigationManager nm
+
+<h3>AddNewExpertise</h3>
+
+<br />
+<EditForm Model="expModel" OnSubmit="SaveExp">
+
+	<input type="text" @bind-value="expModel.ExpTitle" placeholder="Enter Expertise Title" />
+	<br />
+	<input type="text" @bind-value="expModel.Abbreviation" placeholder="Enter Abbreviation" />
+	<br />
+	<br />
+	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+
+</EditForm>
+<br />
+
+@code {
+	private ExpModel expModel { get; set; } = new ExpModel();
+	private void SaveExp()
+	{
+
+		if (ExpDAL.SaveExp(expModel) == 1)
+		{
+			nm.NavigateTo("exp/expertise");
+		}
+	}
+}

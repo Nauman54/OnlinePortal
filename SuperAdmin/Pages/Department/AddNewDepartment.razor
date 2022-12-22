@@ -1,8 +1,10 @@
-﻿@page "/Department/addnewdepartment/{OrgID}"
+﻿@page "/dept/addnewdepartment/{OrgID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
+@inject NavigationManager nm
 
 <h3>Add New Department</h3>
+<br />
 
 <EditForm Model="deptModel" OnSubmit="SaveDept">
 
@@ -11,25 +13,22 @@
 	@*<input type="text" @bind-value="deptModel.OrgID" placeholder="Enter Organization ID" />
 	<br />*@
 	<br />
-	<button type="submit">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
 
 </EditForm>
 <br />
-<p>@msg</p>
 
 @code {
 	[Parameter]
 	public string? OrgID { get; set; }
 	private DeptModel deptModel { get; set; } = new DeptModel();
-	private string? msg { get; set; }
 
 	private void SaveDept()
 	{
 		deptModel.OrgID = int.Parse(OrgID);
-		int i = DeptDAL.SaveDept(deptModel);
-		if (i == 1)
+		if (DeptDAL.SaveDept(deptModel) == 1)
 		{
-			msg = "Saved";
+			nm.NavigateTo("dept/department");
 		}
 	}
 }

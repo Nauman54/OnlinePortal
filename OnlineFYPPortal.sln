@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibraryDAL", "ClassLibraryDAL\ClassLibraryDAL.csproj", "{ED0AE061-D75E-4D09-ACFF-24F7918B4014}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibraryDAL", "ClassLibraryDAL\ClassLibraryDAL.csproj", "{ED0AE061-D75E-4D09-ACFF-24F7918B4014}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibraryModel", "ClassLibraryModel\ClassLibraryModel.csproj", "{0AB0C1AC-BA23-40AF-8D58-246EED861630}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibraryModel", "ClassLibraryModel\ClassLibraryModel.csproj", "{0AB0C1AC-BA23-40AF-8D58-246EED861630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SuperAdmin", "SuperAdmin\SuperAdmin.csproj", "{8ED4519C-8347-4A73-AA2B-577FCB890497}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SuperAdmin", "SuperAdmin\SuperAdmin.csproj", "{8ED4519C-8347-4A73-AA2B-577FCB890497}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

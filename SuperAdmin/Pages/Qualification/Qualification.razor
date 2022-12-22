@@ -1,0 +1,56 @@
+﻿@page "/qual/qualifications"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+
+<h3>Qualification</h3>
+
+<br />
+<a href="qual/addnewqual" class="btn btn-outline-primary btn-sm">Add New Qualification</a>
+<br />
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Title</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in qualData)
+	{
+		<tr>
+			<td>@item.QualID</td>
+			<td>@item.QualTitle</td>
+			<td>
+			<button class="btn btn-outline-danger btn-sm"
+			@onclick="(()=>DeleteQual(item.QualID))">
+				Delete
+			</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code {
+	private List<QualModel> qualData { get; set; } = new List<QualModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadQual();
+	}
+
+	private void LoadQual()
+	{
+		qualData = QualDAL.GetQual();
+	}
+
+	private void DeleteQual(int QualID)
+	{
+		int i = QualDAL.DeleteQual(QualID);
+		if (i == 1)
+		{
+			LoadQual();
+		}
+	}
+}

@@ -1,7 +1,76 @@
-﻿@page "/Faculty/addnewfaculty"
+﻿@page "/facl/addnewfacl/{DeptID}"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+@inject NavigationManager nm
 
 <h3>AddNewFaculty</h3>
 
+<br />
+<EditForm Model="faclModel" OnSubmit="SaveFacl">
+
+	<input type="text" @bind-value="faclModel.FaclFirstName" placeholder="Enter First Name" />
+	<br />
+	<input type="text" @bind-value="faclModel.FaclLastName" placeholder="Enter Last Name" />
+	<br />
+	<input type="text" @bind-value="faclModel.FaclPhoneNo" placeholder="Enter Phone No" />
+	<br />
+	<input type="text" @bind-value="faclModel.FaclEmail" placeholder="Enter Email" />
+	<br />
+	<input type="text" @bind-value="faclModel.FaclAddress" placeholder="Enter Address" />
+	<br />
+	@*<input type="text" @bind-value="faclModel.PosID" placeholder="Enter Position" />*@
+	<select class="form-control" @onchange="GetPositions">
+		@foreach (var item in posModels)
+		{
+			<option value="@item.PosID">@item.PosTitle</option>
+		}
+	</select>
+	<br />
+	<input type="text" @bind-value="faclModel.ExpID" placeholder="Enter Expertise" />
+	<br />
+	<input type="text" @bind-value="faclModel.QualID" placeholder="Enter Qualification" />
+	<br />
+	@*<input type="text" @bind-value="faclModel.DeptID" placeholder="Enter Department" />
+	<br />*@
+	<input type="text" @bind-value="faclModel.OrgID" placeholder="Enter Organization" />
+	<br />
+	<br />
+	
+	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<br />
+	@positions
+</EditForm>
+<br />
+
 @code {
 
+	[Parameter]
+	public string? DeptID { get; set; }
+	private List<PosModel> posModels { get; set; } = new List<PosModel>();
+	private FaclModel faclModel { get; set; } = new FaclModel();
+	private string positions { get; set; }
+
+	protected override void OnInitialized()
+	{
+		LoadPostions();
+	}
+
+	private void SaveFacl()
+	{
+		faclModel.DeptID = int.Parse(DeptID);
+		if (FaclDAL.SaveFacl(faclModel) == 1)
+		{
+			nm.NavigateTo("facl/faculty");
+		}
+	}
+
+	private void GetPositions(ChangeEventArgs e)
+	{
+		positions = e.Value as string;
+
+	}
+	private void LoadPostions()
+	{
+		posModels = PosDAL.GetPos();
+	}
 }

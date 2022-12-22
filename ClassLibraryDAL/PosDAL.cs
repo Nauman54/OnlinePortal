@@ -8,50 +8,47 @@ using ClassLibraryModel;
 
 namespace ClassLibraryDAL
 {
-	public class DeptDAL
+	public class PosDAL
 	{
-		public static int SaveDept(DeptModel dm)
+		public static int SavePos(PosModel pm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_SaveDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_SavePos", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptName", dm.DeptName);
-			cmd.Parameters.AddWithValue("@OrgID", dm.OrgID);
+			cmd.Parameters.AddWithValue("@PosTitle", pm.PosTitle);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
 		}
 
-		public static List<DeptModel> GetDept()
+		public static List<PosModel> GetPos()
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_GetDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_GetPos", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 
 			SqlDataReader sdr = cmd.ExecuteReader();
-			List<DeptModel> Deptlist = new List<DeptModel>();
+			List<PosModel> Poslist = new List<PosModel>();
 			while (sdr.Read())
 			{
-				DeptModel dept = new DeptModel();
-				dept.DeptID = int.Parse(sdr["DeptID"].ToString());
-				dept.DeptName = sdr["DeptName"].ToString();
-				dept.OrgID = int.Parse(sdr["OrgID"].ToString());
-				Deptlist.Add(dept);
+				PosModel pos = new PosModel();
+				pos.PosID = int.Parse(sdr["PosID"].ToString());
+				pos.PosTitle = sdr["PosTitle"].ToString();
+				Poslist.Add(pos);
 			}
-
 			con.Close();
-			return Deptlist;
+			return Poslist;
 		}
 
-		public static int DeleteDept(int DeptID)
+		public static int DeletePos(int PosID)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();
-			SqlCommand cmd = new SqlCommand("Sp_DeleteDept", con);
+			SqlCommand cmd = new SqlCommand("Sp_DeletePos", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
-			cmd.Parameters.AddWithValue("@DeptID", DeptID);
+			cmd.Parameters.AddWithValue("@PosID", PosID);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

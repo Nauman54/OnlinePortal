@@ -1,0 +1,57 @@
+﻿@page "/pos/positions"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+
+<h3>Position</h3>
+
+<br />
+<a href="pos/addnewpos" class="btn btn-outline-primary btn-sm">Add New Position</a>
+<br />
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Title</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in posData)
+	{
+			<tr>
+				<td>@item.PosID</td>
+				<td>@item.PosTitle</td>
+				<td>
+					<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeletePos(item.PosID))">
+						Delete
+					</button>
+				</td>
+			</tr>
+	}
+</table>
+
+
+@code {
+	private List<PosModel> posData { get; set; } = new List<PosModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadPos();
+	}
+
+	private void LoadPos()
+	{
+		posData = PosDAL.GetPos();
+	}
+
+	private void DeletePos(int PosID)
+	{
+		int i = PosDAL.DeletePos(PosID);
+		if (i == 1)
+		{
+			LoadPos();
+		}
+	}
+}
