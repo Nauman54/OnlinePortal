@@ -1,4 +1,4 @@
-﻿@page "/dept/addnewdepartment/{OrgID}"
+﻿@page "/dept/addnewdepartment"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -8,10 +8,24 @@
 
 <EditForm Model="deptModel" OnSubmit="SaveDept">
 
+	<br />
+	<label>Name</label>
+	<br />
 	<input type="text" @bind-value="deptModel.DeptName" placeholder="Enter Department Name" />
+	<br />
 	<br />
 	@*<input type="text" @bind-value="deptModel.OrgID" placeholder="Enter Organization ID" />
 	<br />*@
+	<label>Organization</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetOrganizations">
+		<option value="0">--Select Organization--</option>
+		@foreach (var item in orgModels)
+		{
+			<option value="@item.OrgID">@item.OrgName</option>
+		}
+	</select>
+	<br />
 	<br />
 	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
 
@@ -19,16 +33,36 @@
 <br />
 
 @code {
-	[Parameter]
-	public string? OrgID { get; set; }
+
 	private DeptModel deptModel { get; set; } = new DeptModel();
+
+	private List<OrgModel> orgModels { get; set; } = new List<OrgModel>();
+	private int organization { get; set; }
+
+	protected override void OnInitialized()
+	{
+		LoadOrganizations();
+	}
+
+	private void GetOrganizations(ChangeEventArgs e)
+	{
+		organization = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadOrganizations()
+	{
+		orgModels = OrgDAL.GetOrg();
+	}
 
 	private void SaveDept()
 	{
-		deptModel.OrgID = int.Parse(OrgID);
-		if (DeptDAL.SaveDept(deptModel) == 1)
+		if (organization > 0)
 		{
-			nm.NavigateTo("dept/department");
+			deptModel.OrgID = organization;
+			if (DeptDAL.SaveDept(deptModel) == 1)
+			{
+				nm.NavigateTo("dept/department");
+			}
 		}
 	}
 }

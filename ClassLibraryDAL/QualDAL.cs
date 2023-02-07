@@ -42,6 +42,19 @@ namespace ClassLibraryDAL
 			return Quallist;
 		}
 
+		public static int EditQual(QualModel qm)
+		{
+			SqlConnection con = DBHelper.GetConnection();
+			con.Open();
+			SqlCommand cmd = new SqlCommand("Sp_EditQual", con);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+			cmd.Parameters.AddWithValue("@QualID", qm.QualID);
+			cmd.Parameters.AddWithValue("@QualTitle", qm.QualTitle);
+			int i = cmd.ExecuteNonQuery();
+			con.Close();
+			return i;
+		}
+
 		public static int DeleteQual(int QualID)
 		{
 			SqlConnection con = DBHelper.GetConnection();

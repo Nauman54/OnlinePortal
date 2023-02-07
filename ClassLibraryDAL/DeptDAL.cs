@@ -45,6 +45,20 @@ namespace ClassLibraryDAL
 			return Deptlist;
 		}
 
+		public static int EditDept(DeptModel dm)
+		{
+			SqlConnection con = DBHelper.GetConnection();
+			con.Open();
+			SqlCommand cmd = new SqlCommand("Sp_EditDept", con);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+			cmd.Parameters.AddWithValue("@DeptID", dm.DeptID);
+			cmd.Parameters.AddWithValue("@DeptName", dm.DeptName);
+			cmd.Parameters.AddWithValue("@OrgID", dm.OrgID);
+			int i = cmd.ExecuteNonQuery();
+			con.Close();
+			return i;
+		}
+
 		public static int DeleteDept(int DeptID)
 		{
 			SqlConnection con = DBHelper.GetConnection();

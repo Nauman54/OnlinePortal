@@ -8,7 +8,13 @@
 <br />
 <EditForm Model="expModel" OnSubmit="SaveExp">
 
+	<br />
+	<label>Title</label>
+	<br />
 	<input type="text" @bind-value="expModel.ExpTitle" placeholder="Enter Expertise Title" />
+	<br />
+	<br />
+	<label>Abbreviation</label>
 	<br />
 	<input type="text" @bind-value="expModel.Abbreviation" placeholder="Enter Abbreviation" />
 	<br />

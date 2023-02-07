@@ -1,36 +1,96 @@
 ﻿@page "/org/addneworg"
+@page "/org/addneworg/{OrgID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
 
 <h3>Add New Organization</h3>
-<br />
-<EditForm Model="orgModel" OnSubmit="SaveOrg">
 
+<br />
+
+<EditForm Model="orgModel" OnSubmit="SaveOrg">
+	<br />
+	<label>Name</label>
+	<br />
 	<input type="text" @bind-value="orgModel.OrgName" placeholder="Enter Organization Name" />
+	<br />
+	<br />
+	<label>Address</label>
 	<br />
 	<input type="text" @bind-value="orgModel.OrgAddress" placeholder="Enter Address" />
 	<br />
-	<input type="text" @bind-value="orgModel.OrgPhoneNo" placeholder="Enter Phone Number" />
+	<br />
+	<label>Phone Number</label>
+	<br />
+	<input type="text" @bind-value="orgModel.OrgPhoneNo" placeholder="Enter Phone No" />
+	<br />
+	<br />
+	<label>Email</label>
 	<br />
 	<input type="text" @bind-value="orgModel.OrgEmail" placeholder="Enter Email" />
 	<br />
 	<br />
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
 <br />
 
+
 @code {
 
-	private OrgModel orgModel { get; set; } = new OrgModel();
-	private void SaveOrg()
-	{
+	[Parameter]
+	public string? OrgID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<OrgModel>? orgData { get; set; }
 
-		if (OrgDAL.SaveOrg(orgModel)==1)
+	private OrgModel orgModel { get; set; } = new OrgModel();
+
+
+	protected override void OnInitialized()
+	{
+		if (!string.IsNullOrEmpty(OrgID))
 		{
-			nm.NavigateTo("org/organizations");
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in orgData)
+			{
+				orgModel.OrgID = item.OrgID;
+				orgModel.OrgName = item.OrgName;
+				orgModel.OrgAddress = item.OrgAddress;
+				orgModel.OrgPhoneNo = item.OrgPhoneNo;
+				orgModel.OrgEmail = item.OrgEmail;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
 		}
 	}
 
+
+	private void SaveOrg()
+	{
+		if (ButtonName == "Save")
+		{
+			if (OrgDAL.SaveOrg(orgModel) == 1)
+			{
+				nm.NavigateTo("org/organizations");
+			}
+		}
+		else
+		{
+			orgModel.OrgID = int.Parse(OrgID);
+			if (OrgDAL.EditOrg(orgModel) == 1)
+			{
+				nm.NavigateTo("org/organizations");
+			}
+		}
+	}
+
+	private void GetData()
+	{
+		orgData=OrgDAL.GetOrgByID(int.Parse(OrgID));
+	}
 }
+
+

@@ -42,6 +42,19 @@ namespace ClassLibraryDAL
 			return Poslist;
 		}
 
+		public static int EditPos(PosModel pm)
+		{
+			SqlConnection con = DBHelper.GetConnection();
+			con.Open();
+			SqlCommand cmd = new SqlCommand("Sp_EditPos", con);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+			cmd.Parameters.AddWithValue("@PosID", pm.PosID);
+			cmd.Parameters.AddWithValue("@PosTitle", pm.PosTitle);
+			int i = cmd.ExecuteNonQuery();
+			con.Close();
+			return i;
+		}
+
 		public static int DeletePos(int PosID)
 		{
 			SqlConnection con = DBHelper.GetConnection();

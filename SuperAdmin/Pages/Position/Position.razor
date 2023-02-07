@@ -2,7 +2,7 @@
 @using ClassLibraryDAL
 @using ClassLibraryModel
 
-<h3>Position</h3>
+<h3>Positions</h3>
 
 <br />
 <a href="pos/addnewpos" class="btn btn-outline-primary btn-sm">Add New Position</a>
@@ -48,8 +48,7 @@
 
 	private void DeletePos(int PosID)
 	{
-		int i = PosDAL.DeletePos(PosID);
-		if (i == 1)
+		if (PosDAL.DeletePos(PosID) == 1)
 		{
 			LoadPos();
 		}

@@ -1,4 +1,4 @@
-﻿@page "/facl/addnewfacl/{DeptID}"
+﻿@page "/facl/addnewfacl"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -7,70 +7,190 @@
 
 <br />
 <EditForm Model="faclModel" OnSubmit="SaveFacl">
-
+	<br />
+	<label>First Name</label>
+	<br />
 	<input type="text" @bind-value="faclModel.FaclFirstName" placeholder="Enter First Name" />
+	<br />
+	<br />
+	<label>Last Name</label>
 	<br />
 	<input type="text" @bind-value="faclModel.FaclLastName" placeholder="Enter Last Name" />
 	<br />
+	<br />
+	<label>Phone Number</label>
+	<br />
 	<input type="text" @bind-value="faclModel.FaclPhoneNo" placeholder="Enter Phone No" />
+	<br />
+	<br />
+	<label>Email</label>
 	<br />
 	<input type="text" @bind-value="faclModel.FaclEmail" placeholder="Enter Email" />
 	<br />
+	<br />
+	<label>Address</label>
+	<br />
 	<input type="text" @bind-value="faclModel.FaclAddress" placeholder="Enter Address" />
 	<br />
+	<br />
+	<label>Position</label>
+	<br />
 	@*<input type="text" @bind-value="faclModel.PosID" placeholder="Enter Position" />*@
-	<select class="form-control" @onchange="GetPositions">
+	<select class="form-control-sm" @onchange="GetPositions">
+		<option value="0">--Select Position--</option>
 		@foreach (var item in posModels)
 		{
 			<option value="@item.PosID">@item.PosTitle</option>
 		}
 	</select>
 	<br />
-	<input type="text" @bind-value="faclModel.ExpID" placeholder="Enter Expertise" />
 	<br />
-	<input type="text" @bind-value="faclModel.QualID" placeholder="Enter Qualification" />
+	<label>Expertise</label>
+	<br />
+	@*<input type="text" @bind-value="faclModel.ExpID" placeholder="Enter Expertise" />*@
+	<select class="form-control-sm" @onchange="GetExpertise">
+		<option value="0">--Select Expertise--</option>
+		@foreach (var item in expModels)
+		{
+			<option value="@item.ExpID">@item.ExpTitle</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Qualification</label>
+	<br />
+	@*<input type="text" @bind-value="faclModel.QualID" placeholder="Enter Qualification" />*@
+	<select class="form-control-sm" @onchange="GetQualifications">
+		<option value="0">--Select Qualification--</option>
+		@foreach (var item in qualModels)
+		{
+		<option value="@item.QualID">@item.QualTitle</option>
+		}
+	</select>
+	<br />
 	<br />
 	@*<input type="text" @bind-value="faclModel.DeptID" placeholder="Enter Department" />
+	<br />
 	<br />*@
-	<input type="text" @bind-value="faclModel.OrgID" placeholder="Enter Organization" />
+	<label>Department</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetDepartments">
+		<option value="0">--Select Department--</option>
+		@foreach (var item in deptModels)
+		{
+			<option value="@item.DeptID">@item.DeptName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Organization</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetOrganizations">
+		<option value="0">--Select Organization--</option>
+		@foreach (var item in orgModels)
+		{
+			<option value="@item.OrgID">@item.OrgName</option>
+		}
+	</select>
 	<br />
 	<br />
 	
 	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
 	<br />
-	@positions
 </EditForm>
-<br />
 
 @code {
 
-	[Parameter]
-	public string? DeptID { get; set; }
-	private List<PosModel> posModels { get; set; } = new List<PosModel>();
 	private FaclModel faclModel { get; set; } = new FaclModel();
-	private string positions { get; set; }
+
+	private List<PosModel> posModels { get; set; } = new List<PosModel>();
+	private int position { get; set; }
+
+	private List<ExpModel> expModels { get; set; } = new List<ExpModel>();
+	private int expertise { get; set; }
+
+	private List<QualModel> qualModels { get; set; } = new List<QualModel>();
+	private int qualification { get; set; }
+
+	private List<DeptModel> deptModels { get; set; } = new List<DeptModel>();
+	private int department { get; set; }
+
+	private List<OrgModel> orgModels { get; set; } = new List<OrgModel>();
+	private int organization { get; set; }
 
 	protected override void OnInitialized()
 	{
 		LoadPostions();
-	}
-
-	private void SaveFacl()
-	{
-		faclModel.DeptID = int.Parse(DeptID);
-		if (FaclDAL.SaveFacl(faclModel) == 1)
-		{
-			nm.NavigateTo("facl/faculty");
-		}
+		LoadExpertise();
+		LoadQualifications();
+		LoadDepartments();
+		LoadOrganizations();
 	}
 
 	private void GetPositions(ChangeEventArgs e)
 	{
-		positions = e.Value as string;
-
+		position = int.Parse(e.Value.ToString());
 	}
+
 	private void LoadPostions()
 	{
 		posModels = PosDAL.GetPos();
+	}
+
+	private void GetExpertise(ChangeEventArgs e)
+	{
+		expertise = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadExpertise()
+	{
+		expModels = ExpDAL.GetExp();
+	}
+
+	private void GetQualifications(ChangeEventArgs e)
+	{
+		qualification = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadQualifications()
+	{
+		qualModels = QualDAL.GetQual();
+	}
+
+	private void GetDepartments(ChangeEventArgs e)
+	{
+		department = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadDepartments()
+	{
+		deptModels = DeptDAL.GetDept();
+	}
+
+	private void GetOrganizations(ChangeEventArgs e)
+	{
+		organization = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadOrganizations()
+	{
+		orgModels = OrgDAL.GetOrg();
+	}
+
+	private void SaveFacl()
+	{
+		if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
+		{
+			faclModel.PosID = position;
+			faclModel.ExpID = expertise;
+			faclModel.QualID = qualification;
+			faclModel.DeptID = department;
+			faclModel.OrgID = organization;
+			if (FaclDAL.SaveFacl(faclModel) == 1)
+			{
+				nm.NavigateTo("facl/faculty");
+			}
+		}
+		
 	}
 }

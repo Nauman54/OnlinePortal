@@ -5,7 +5,7 @@
 <h3>Departments</h3>
 
 <br />
-<a href="org/organizations" class="btn btn-outline-primary btn-sm">Add New Department</a>
+<a href="dept/addnewdepartment" class="btn btn-outline-primary btn-sm">Add New Department</a>
 <br />
 <br />
 <table class="table table-bordered">
@@ -28,7 +28,7 @@
 					@onclick="(()=>DeleteDept(item.DeptID))">
 					Delete
 				</button>
-				<a href="facl/addnewfacl/@item.DeptID" class="btn btn-outline-primary btn-sm">Add Faculty</a>
+				<a href="facl/addnewfacl" class="btn btn-outline-primary btn-sm">Add Faculty</a>
 			</td>
 		</tr>
 	}

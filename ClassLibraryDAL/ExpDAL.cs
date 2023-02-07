@@ -44,6 +44,20 @@ namespace ClassLibraryDAL
 			return Explist;
 		}
 
+		public static int EditExp(ExpModel em)
+		{
+			SqlConnection con = DBHelper.GetConnection();
+			con.Open();
+			SqlCommand cmd = new SqlCommand("Sp_EditExp", con);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+			cmd.Parameters.AddWithValue("@ExpID", em.ExpID);
+			cmd.Parameters.AddWithValue("@ExpTitle", em.ExpTitle);
+			cmd.Parameters.AddWithValue("@Abbreviation", em.Abbreviation);
+			int i = cmd.ExecuteNonQuery();
+			con.Close();
+			return i;
+		}
+
 		public static int DeleteExp(int ExpID)
 		{
 			SqlConnection con = DBHelper.GetConnection();

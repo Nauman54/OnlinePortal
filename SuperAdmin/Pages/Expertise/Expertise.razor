@@ -48,8 +48,7 @@
 
 	private void DeleteExp(int ExpID)
 	{
-		int i = ExpDAL.DeleteExp(ExpID);
-		if (i == 1)
+		if (ExpDAL.DeleteExp(ExpID) == 1)
 		{
 			LoadExp();
 		}

@@ -2,7 +2,7 @@
 @using ClassLibraryDAL
 @using ClassLibraryModel
 
-<h3>Qualification</h3>
+<h3>Qualifications</h3>
 
 <br />
 <a href="qual/addnewqual" class="btn btn-outline-primary btn-sm">Add New Qualification</a>
@@ -47,8 +47,7 @@
 
 	private void DeleteQual(int QualID)
 	{
-		int i = QualDAL.DeleteQual(QualID);
-		if (i == 1)
+		if (QualDAL.DeleteQual(QualID) == 1)
 		{
 			LoadQual();
 		}

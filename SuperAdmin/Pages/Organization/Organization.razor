@@ -28,15 +28,18 @@
 			<td>@item.OrgPhoneNo</td>
 			<td>@item.OrgEmail</td>
 			<td>
+				<a href="org/addneworg/@item.OrgID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"
 					@onclick="(()=>DeleteOrg(item.OrgID))">
 					Delete
 				</button>
-				<a href="dept/addnewdepartment/@item.OrgID" class="btn btn-outline-primary btn-sm">Add Department</a>
+				<a href="dept/addnewdepartment" class="btn btn-outline-primary btn-sm">Add Department</a>
 			</td>
 		</tr>
 	}
 </table>
+
+
 
 @code {
 

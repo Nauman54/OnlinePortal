@@ -61,6 +61,28 @@ namespace ClassLibraryDAL
 			return Facllist;
 		}
 
+		public static int EditFacl(FaclModel fm)
+		{
+			SqlConnection con = DBHelper.GetConnection();
+			con.Open();
+			SqlCommand cmd = new SqlCommand("Sp_EditFacl", con);
+			cmd.CommandType = System.Data.CommandType.StoredProcedure;
+			cmd.Parameters.AddWithValue("@FaclID", fm.FaclID);
+			cmd.Parameters.AddWithValue("@FaclFirstName", fm.FaclFirstName);
+			cmd.Parameters.AddWithValue("@FaclLastName", fm.FaclLastName);
+			cmd.Parameters.AddWithValue("@FaclPhoneNo", fm.FaclPhoneNo);
+			cmd.Parameters.AddWithValue("@FaclEmail", fm.FaclEmail);
+			cmd.Parameters.AddWithValue("@FaclAddress", fm.FaclAddress);
+			cmd.Parameters.AddWithValue("@PosID", fm.PosID);
+			cmd.Parameters.AddWithValue("@ExpID", fm.ExpID);
+			cmd.Parameters.AddWithValue("@QualID", fm.QualID);
+			cmd.Parameters.AddWithValue("@DeptID", fm.DeptID);
+			cmd.Parameters.AddWithValue("@OrgID", fm.OrgID);
+			int i = cmd.ExecuteNonQuery();
+			con.Close();
+			return i;
+		}
+
 		public static int DeleteFacl(int FaclID)
 		{
 			SqlConnection con = DBHelper.GetConnection();
