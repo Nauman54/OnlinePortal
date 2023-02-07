@@ -61,7 +61,37 @@ namespace ClassLibraryDAL
 			return Facllist;
 		}
 
-		public static int EditFacl(FaclModel fm)
+        public static List<FaclModel> GetFaclByID(int FaclID)
+        {
+            SqlConnection con = DBHelper.GetConnection();
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Sp_GetFaclByID", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@FaclID", FaclID);
+
+            SqlDataReader sdr = cmd.ExecuteReader();
+            List<FaclModel> Facllist = new List<FaclModel>();
+            while (sdr.Read())
+            {
+                FaclModel facl = new FaclModel();
+                facl.FaclFirstName = sdr["FaclFirstName"].ToString();
+                facl.FaclLastName = sdr["FaclLastName"].ToString();
+                facl.FaclPhoneNo = sdr["FaclPhoneNo"].ToString();
+                facl.FaclEmail = sdr["FaclEmail"].ToString();
+                facl.FaclAddress = sdr["FaclAddress"].ToString();
+                facl.PosID = int.Parse(sdr["PosID"].ToString());
+                facl.ExpID = int.Parse(sdr["ExpID"].ToString());
+                facl.QualID = int.Parse(sdr["QualID"].ToString());
+                facl.DeptID = int.Parse(sdr["DeptID"].ToString());
+                facl.OrgID = int.Parse(sdr["OrgID"].ToString());
+                Facllist.Add(facl);
+            }
+
+            con.Close();
+            return Facllist;
+        }
+
+        public static int EditFacl(FaclModel fm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();

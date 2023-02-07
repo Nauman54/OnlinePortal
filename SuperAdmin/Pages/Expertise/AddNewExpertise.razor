@@ -1,4 +1,5 @@
 ﻿@page "/exp/addnewexp"
+@page "/exp/addnewexp/{ExpID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -19,19 +20,61 @@
 	<input type="text" @bind-value="expModel.Abbreviation" placeholder="Enter Abbreviation" />
 	<br />
 	<br />
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
 <br />
 
 @code {
-	private ExpModel expModel { get; set; } = new ExpModel();
-	private void SaveExp()
-	{
 
-		if (ExpDAL.SaveExp(expModel) == 1)
+	[Parameter]
+	public string? ExpID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<ExpModel>? expData { get; set; }
+
+	private ExpModel expModel { get; set; } = new ExpModel();
+
+	protected override void OnInitialized()
+	{
+		if (!string.IsNullOrEmpty(ExpID))
 		{
-			nm.NavigateTo("exp/expertise");
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in expData)
+			{
+				expModel.ExpID = item.ExpID;
+				expModel.ExpTitle = item.ExpTitle;
+				expModel.Abbreviation = item.Abbreviation;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
 		}
 	}
+
+	private void SaveExp()
+	{
+		if (ButtonName == "Save")
+		{
+			if (ExpDAL.SaveExp(expModel) == 1)
+			{
+				nm.NavigateTo("exp/expertise");
+			}
+		}
+		else
+		{
+			expModel.ExpID = int.Parse(ExpID);
+			if (ExpDAL.SaveExp(expModel) == 1)
+			{
+				nm.NavigateTo("exp/expertise");
+			}
+		}
+	}
+
+	private void GetData()
+	{
+		expData = ExpDAL.GetExpByID(int.Parse(ExpID));
+	}
+
 }

@@ -42,7 +42,27 @@ namespace ClassLibraryDAL
 			return Quallist;
 		}
 
-		public static int EditQual(QualModel qm)
+        public static List<QualModel> GetQualByID(int QualID)
+        {
+            SqlConnection con = DBHelper.GetConnection();
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Sp_GetQualByID", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@QualID", QualID);
+
+            SqlDataReader sdr = cmd.ExecuteReader();
+            List<QualModel> Quallist = new List<QualModel>();
+            while (sdr.Read())
+            {
+                QualModel qual = new QualModel();
+                qual.QualTitle = sdr["QualTitle"].ToString();
+                Quallist.Add(qual);
+            }
+            con.Close();
+            return Quallist;
+        }
+
+        public static int EditQual(QualModel qm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();

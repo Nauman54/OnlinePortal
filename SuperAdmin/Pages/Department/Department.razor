@@ -24,6 +24,7 @@
 			<td>@item.DeptName</td>
 			<td>@item.OrgID</td>
 			<td>
+				<a href="dept/addnewdepartment/@item.DeptID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"
 					@onclick="(()=>DeleteDept(item.DeptID))">
 					Delete

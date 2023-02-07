@@ -1,4 +1,5 @@
 ﻿@page "/qual/addnewqual"
+@page "/qual/addnewqual/{QualID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -14,19 +15,61 @@
 	<input type="text" @bind-value="qualModel.QualTitle" placeholder="Enter Qualification Title" />
 	<br />
 	<br />
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
 <br />
 
 @code {
-	private QualModel qualModel { get; set; } = new QualModel();
-	private void SaveQual()
-	{
 
-		if (QualDAL.SaveQual(qualModel) == 1)
+	[Parameter]
+	public string? QualID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<QualModel>? qualData { get; set; }
+
+	private QualModel qualModel { get; set; } = new QualModel();
+
+	protected override void OnInitialized()
+	{
+		if (!string.IsNullOrEmpty(QualID))
 		{
-			nm.NavigateTo("qual/qualifications");
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in qualData)
+			{
+				qualModel.QualID = item.QualID;
+				qualModel.QualTitle = item.QualTitle;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
 		}
 	}
+
+	private void SaveQual()
+	{
+		if (ButtonName == "Save")
+		{
+			if (QualDAL.SaveQual(qualModel) == 1)
+			{
+				nm.NavigateTo("qual/qualifications");
+			}
+		}
+		else
+		{
+			qualModel.QualID = int.Parse(QualID);
+			if (QualDAL.SaveQual(qualModel) == 1)
+			{
+				nm.NavigateTo("qual/qualifications");
+			}
+		}
+		
+	}
+
+	private void GetData()
+	{
+		qualData = QualDAL.GetQualByID(int.Parse(QualID));
+	}
+
 }

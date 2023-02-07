@@ -44,7 +44,28 @@ namespace ClassLibraryDAL
 			return Explist;
 		}
 
-		public static int EditExp(ExpModel em)
+        public static List<ExpModel> GetExpByID(int ExpID)
+        {
+            SqlConnection con = DBHelper.GetConnection();
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Sp_GetExpByID", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@ExpID", ExpID);
+
+            SqlDataReader sdr = cmd.ExecuteReader();
+            List<ExpModel> Explist = new List<ExpModel>();
+            while (sdr.Read())
+            {
+                ExpModel exp = new ExpModel();
+                exp.ExpTitle = sdr["ExpTitle"].ToString();
+                exp.Abbreviation = sdr["Abbreviation"].ToString();
+                Explist.Add(exp);
+            }
+            con.Close();
+            return Explist;
+        }
+
+        public static int EditExp(ExpModel em)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();

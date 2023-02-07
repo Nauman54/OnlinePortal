@@ -1,4 +1,5 @@
 ﻿@page "/facl/addnewfacl"
+@page "/facl/addnewfacl/{FaclID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -35,7 +36,6 @@
 	<br />
 	<label>Position</label>
 	<br />
-	@*<input type="text" @bind-value="faclModel.PosID" placeholder="Enter Position" />*@
 	<select class="form-control-sm" @onchange="GetPositions">
 		<option value="0">--Select Position--</option>
 		@foreach (var item in posModels)
@@ -47,7 +47,6 @@
 	<br />
 	<label>Expertise</label>
 	<br />
-	@*<input type="text" @bind-value="faclModel.ExpID" placeholder="Enter Expertise" />*@
 	<select class="form-control-sm" @onchange="GetExpertise">
 		<option value="0">--Select Expertise--</option>
 		@foreach (var item in expModels)
@@ -59,7 +58,6 @@
 	<br />
 	<label>Qualification</label>
 	<br />
-	@*<input type="text" @bind-value="faclModel.QualID" placeholder="Enter Qualification" />*@
 	<select class="form-control-sm" @onchange="GetQualifications">
 		<option value="0">--Select Qualification--</option>
 		@foreach (var item in qualModels)
@@ -69,9 +67,6 @@
 	</select>
 	<br />
 	<br />
-	@*<input type="text" @bind-value="faclModel.DeptID" placeholder="Enter Department" />
-	<br />
-	<br />*@
 	<label>Department</label>
 	<br />
 	<select class="form-control-sm" @onchange="GetDepartments">
@@ -95,11 +90,16 @@
 	<br />
 	<br />
 	
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 	<br />
 </EditForm>
 
 @code {
+
+	[Parameter]
+	public string? FaclID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<FaclModel>? faclData { get; set; }
 
 	private FaclModel faclModel { get; set; } = new FaclModel();
 
@@ -125,6 +125,30 @@
 		LoadQualifications();
 		LoadDepartments();
 		LoadOrganizations();
+
+		if (!string.IsNullOrEmpty(FaclID))
+		{
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in faclData)
+			{
+				faclModel.FaclID = item.FaclID;
+				faclModel.FaclFirstName = item.FaclFirstName;
+				faclModel.FaclLastName = item.FaclLastName;
+				faclModel.FaclPhoneNo = item.FaclPhoneNo;
+				faclModel.FaclEmail = item.FaclEmail;
+				faclModel.FaclAddress = item.FaclAddress;
+				faclModel.PosID = item.PosID;
+				faclModel.ExpID = item.ExpID;
+				faclModel.QualID = item.QualID;
+				faclModel.DeptID = item.DeptID;
+				faclModel.OrgID = item.OrgID;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
+		}
 	}
 
 	private void GetPositions(ChangeEventArgs e)
@@ -179,18 +203,42 @@
 
 	private void SaveFacl()
 	{
-		if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
+		if (ButtonName == "Save")
 		{
-			faclModel.PosID = position;
-			faclModel.ExpID = expertise;
-			faclModel.QualID = qualification;
-			faclModel.DeptID = department;
-			faclModel.OrgID = organization;
-			if (FaclDAL.SaveFacl(faclModel) == 1)
+			if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
 			{
-				nm.NavigateTo("facl/faculty");
+				faclModel.PosID = position;
+				faclModel.ExpID = expertise;
+				faclModel.QualID = qualification;
+				faclModel.DeptID = department;
+				faclModel.OrgID = organization;
+				if (FaclDAL.SaveFacl(faclModel) == 1)
+				{
+					nm.NavigateTo("facl/faculty");
+				}
 			}
 		}
-		
+		else
+		{
+			if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
+			{
+				faclModel.FaclID = int.Parse(FaclID);
+				faclModel.PosID = position;
+				faclModel.ExpID = expertise;
+				faclModel.QualID = qualification;
+				faclModel.DeptID = department;
+				faclModel.OrgID = organization;
+				if (FaclDAL.EditFacl(faclModel) == 1)
+				{
+					nm.NavigateTo("facl/faculty");
+				}
+			}
+		}
 	}
+
+	private void GetData()
+	{
+		faclData = FaclDAL.GetFaclByID(int.Parse(FaclID));
+	}
+
 }

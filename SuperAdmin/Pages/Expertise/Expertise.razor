@@ -24,6 +24,7 @@
 			<td>@item.ExpTitle</td>
 			<td>@item.Abbreviation</td>
 			<td>
+				<a href="exp/addnewexp/@item.ExpID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"
 					@onclick="(()=>DeleteExp(item.ExpID))">
 					Delete

@@ -1,4 +1,5 @@
 ﻿@page "/pos/addnewpos"
+@page "/pos/addnewpos/{PosID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -13,19 +14,61 @@
 	<input type="text" @bind-value="posModel.PosTitle" placeholder="Enter Position Title" />
 	<br />
 	<br />
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
 <br />
 
 @code {
-	private PosModel posModel { get; set; } = new PosModel();
-	private void SavePos()
-	{
 
-		if (PosDAL.SavePos(posModel) == 1)
+	[Parameter]
+	public string? PosID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<PosModel>? posData { get; set; }
+
+	private PosModel posModel { get; set; } = new PosModel();
+
+	protected override void OnInitialized()
+	{
+		if (!string.IsNullOrEmpty(PosID))
 		{
-			nm.NavigateTo("pos/positions");
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in posData)
+			{
+				posModel.PosID = item.PosID;
+				posModel.PosTitle = item.PosTitle;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
 		}
 	}
+
+	private void SavePos()
+	{
+		if (ButtonName == "Save")
+		{
+			if (PosDAL.SavePos(posModel) == 1)
+			{
+				nm.NavigateTo("pos/positions");
+			}
+		}
+		else
+		{
+			posModel.PosID = int.Parse(PosID);
+			if (PosDAL.SavePos(posModel) == 1)
+			{
+				nm.NavigateTo("pos/positions");
+			}
+		}
+		
+	}
+
+	private void GetData()
+	{
+		posData = PosDAL.GetPosByID(int.Parse(PosID));
+	}
+
 }

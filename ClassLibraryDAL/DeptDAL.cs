@@ -45,7 +45,29 @@ namespace ClassLibraryDAL
 			return Deptlist;
 		}
 
-		public static int EditDept(DeptModel dm)
+        public static List<DeptModel> GetDeptByID(int DeptID)
+        {
+            SqlConnection con = DBHelper.GetConnection();
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Sp_GetDeptByID", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@DeptID", DeptID);
+
+            SqlDataReader sdr = cmd.ExecuteReader();
+            List<DeptModel> Deptlist = new List<DeptModel>();
+            while (sdr.Read())
+            {
+                DeptModel dept = new DeptModel();
+                dept.DeptName = sdr["DeptName"].ToString();
+                dept.OrgID = int.Parse(sdr["OrgID"].ToString());
+                Deptlist.Add(dept);
+            }
+
+            con.Close();
+            return Deptlist;
+        }
+
+        public static int EditDept(DeptModel dm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();

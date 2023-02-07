@@ -23,10 +23,11 @@
 			<td>@item.QualID</td>
 			<td>@item.QualTitle</td>
 			<td>
-			<button class="btn btn-outline-danger btn-sm"
-			@onclick="(()=>DeleteQual(item.QualID))">
-				Delete
-			</button>
+				<a href="qual/addnewqual/@item.QualID" class="btn btn-outline-primary btn-sm">Edit</a>
+				<button class="btn btn-outline-danger btn-sm"
+				@onclick="(()=>DeleteQual(item.QualID))">
+					Delete
+				</button>
 			</td>
 		</tr>
 	}

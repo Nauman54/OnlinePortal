@@ -1,4 +1,5 @@
 ﻿@page "/dept/addnewdepartment"
+@page "/dept/addnewdepartment/{DeptID}"
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
@@ -27,12 +28,17 @@
 	</select>
 	<br />
 	<br />
-	<button type="submit" class="btn btn-outline-primary btn-sm">Save</button>
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
 <br />
 
 @code {
+
+	[Parameter]
+	public string? DeptID { get; set; }
+	public string? ButtonName { get; set; }
+	private List<DeptModel>? deptData { get; set; }
 
 	private DeptModel deptModel { get; set; } = new DeptModel();
 
@@ -42,6 +48,22 @@
 	protected override void OnInitialized()
 	{
 		LoadOrganizations();
+
+		if (!string.IsNullOrEmpty(DeptID))
+		{
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in deptData)
+			{
+				deptModel.DeptID = item.DeptID;
+				deptModel.DeptName = item.DeptName;
+				deptModel.OrgID = item.OrgID;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
+		}
 	}
 
 	private void GetOrganizations(ChangeEventArgs e)
@@ -56,13 +78,35 @@
 
 	private void SaveDept()
 	{
-		if (organization > 0)
+		if (ButtonName == "Save")
 		{
-			deptModel.OrgID = organization;
-			if (DeptDAL.SaveDept(deptModel) == 1)
+			if (organization > 0)
 			{
-				nm.NavigateTo("dept/department");
+				deptModel.OrgID = organization;
+				if (DeptDAL.SaveDept(deptModel) == 1)
+				{
+					nm.NavigateTo("dept/department");
+				}
+			}
+		}
+		else
+		{
+			if (organization > 0)
+			{
+				deptModel.OrgID = organization;
+				deptModel.DeptID = int.Parse(DeptID);
+				if (DeptDAL.EditDept(deptModel) == 1)
+				{
+					nm.NavigateTo("dept/department");
+				}
 			}
 		}
 	}
+
+
+	private void GetData()
+	{
+		deptData = DeptDAL.GetDeptByID(int.Parse(DeptID));
+	}
+
 }

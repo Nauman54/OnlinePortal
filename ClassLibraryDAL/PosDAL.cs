@@ -42,7 +42,27 @@ namespace ClassLibraryDAL
 			return Poslist;
 		}
 
-		public static int EditPos(PosModel pm)
+        public static List<PosModel> GetPosByID(int PosID)
+        {
+            SqlConnection con = DBHelper.GetConnection();
+            con.Open();
+            SqlCommand cmd = new SqlCommand("Sp_GetPosByID", con);
+            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@PosID", PosID);
+
+            SqlDataReader sdr = cmd.ExecuteReader();
+            List<PosModel> Poslist = new List<PosModel>();
+            while (sdr.Read())
+            {
+                PosModel pos = new PosModel();
+                pos.PosTitle = sdr["PosTitle"].ToString();
+                Poslist.Add(pos);
+            }
+            con.Close();
+            return Poslist;
+        }
+
+        public static int EditPos(PosModel pm)
 		{
 			SqlConnection con = DBHelper.GetConnection();
 			con.Open();

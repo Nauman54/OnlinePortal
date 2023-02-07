@@ -23,6 +23,7 @@
 				<td>@item.PosID</td>
 				<td>@item.PosTitle</td>
 				<td>
+					<a href="pos/addnewpos/@item.PosID" class="btn btn-outline-primary btn-sm">Edit</a>
 					<button class="btn btn-outline-danger btn-sm"
 					@onclick="(()=>DeletePos(item.PosID))">
 						Delete
