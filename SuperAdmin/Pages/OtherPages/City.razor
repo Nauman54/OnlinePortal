@@ -1,0 +1,182 @@
+﻿@page "/others/city"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>City</h3>
+
+<style>
+
+	#MyEditFormlabel1 {
+		margin-left: 40px;
+	}
+
+	#MyEditFormInput1 {
+		margin-left: 20px;
+	}
+
+	#MyEditFormButton1 {
+		margin-left: 40px;
+	}
+
+	#MyEditFormSelect1 {
+		margin-left: 5px;
+	}
+
+	#MyCancelBtn {
+		margin-left: 350px
+	}
+
+</style>
+
+<br />
+<EditForm Model="ctyModel" OnSubmit="SaveCity">
+	<div>
+		<label>City</label>
+		<input type="text" id="MyEditFormInput1" @bind-value="ctyModel.CityName" placeholder="Enter City" />
+		<label id="MyEditFormlabel1">Country</label>
+		<select id="MyEditFormSelect1" class="form-control-sm" @onchange="GetCountry">
+			<option value="0">--Select Country--</option>
+			@foreach (var item in countryModel)
+			{
+				<option value="@item.CountryID">@item.CountryName</option>
+			}
+		</select>
+		<button type="submit" id="MyEditFormButton1" class="btn btn-outline-primary btn-sm">@ButtonName</button>
+	</div>
+</EditForm>
+<button class="btn btn-outline-danger btn-sm" id="MyCancelBtn" @onclick="AddCity">Cancel</button>
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>City</th>
+			<th>Country</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in cityData)
+	{
+			<tr>
+				<td>@item.CityID</td>
+				<td>@item.CityName</td>
+				<td>@item.CountryName</td>
+				<td>
+					<button class="btn btn-outline-primary btn-sm"
+						@onclick="(()=>EditCity(item.CityID))">
+						Edit
+					</button>
+					<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteCity(item.CityID))">
+						Delete
+					</button>
+				</td>
+			</tr>
+	}
+</table>
+
+
+@code {
+
+	private List<CityModel> cityData { get; set; } = new List<CityModel>();
+
+	public string? ButtonName { get; set; }
+
+	public int cityID { get; set; }
+	private List<CityModel> ctyData { get; set; }
+
+	private CityModel cityModel { get; set; } = new CityModel();
+	private CityModel ctyModel { get; set; } = new CityModel();
+
+	private List<CountryModel> countryModel { get; set; } = new List<CountryModel>();
+	private int country { get; set; }
+
+	protected override void OnInitialized()
+	{
+		LoadCountry();
+		LoadCity();
+		ButtonName = "Save";
+	}
+
+	private void GetCountry(ChangeEventArgs e)
+	{
+		country = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCountry()
+	{
+		countryModel = CountryDAL.GetCountry();
+	}
+
+
+	private void LoadCity()
+	{
+		cityData = CityDAL.GetCity();
+	}
+
+	private void DeleteCity(int CityID)
+	{
+		if (CityDAL.DeleteCity(CityID) == 1)
+		{
+			LoadCity();
+		}
+	}
+
+	private void EditCity(int CityID)
+	{
+		ButtonName = "Edit";
+		cityID = CityID;
+		GetData();
+		foreach (var item in ctyData)
+		{
+			ctyModel.CityID = item.CityID;
+			ctyModel.CityName = item.CityName;
+			ctyModel.CountryID = item.CountryID;
+		}
+	}
+
+	private void SaveCity()
+	{
+		if (ButtonName == "Save")
+		{
+			if (country > 0)
+			{
+				ctyModel.CountryID = country;
+				if (CityDAL.SaveCity(ctyModel) == 1)
+				{
+					LoadCity();
+				}
+				ctyModel.CityName = "";
+				ctyModel.CountryName = "";
+			}
+		}
+		else
+		{
+			if(country > 0)
+			{
+				ctyModel.CityID = cityID;
+				ctyModel.CountryID = country;
+				if (CityDAL.EditCity(ctyModel) == 1)
+				{
+					LoadCity();
+				}
+				ButtonName = "Save";
+				ctyModel.CityName = "";
+			}
+		}
+	}
+
+	private void GetData()
+	{
+		ctyData = CityDAL.GetCityByID(cityID);
+	}
+
+	private void AddCity()
+	{
+		ctyModel.CityName = "";
+		ButtonName = "Save";
+	}
+
+}

@@ -3,21 +3,24 @@
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>Add New Organization</h3>
 
 <br />
+
+<style>
+	#imgLogo {
+		width: 90px;
+		height: 90px;
+	}
+</style>
 
 <EditForm Model="orgModel" OnSubmit="SaveOrg">
 	<br />
 	<label>Name</label>
 	<br />
 	<input type="text" @bind-value="orgModel.OrgName" placeholder="Enter Organization Name" />
-	<br />
-	<br />
-	<label>Address</label>
-	<br />
-	<input type="text" @bind-value="orgModel.OrgAddress" placeholder="Enter Address" />
 	<br />
 	<br />
 	<label>Phone Number</label>
@@ -30,6 +33,55 @@
 	<input type="text" @bind-value="orgModel.OrgEmail" placeholder="Enter Email" />
 	<br />
 	<br />
+	<label>Country</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCountry">
+		<option value="0">--Select Country--</option>
+		@foreach (var item in countryModel)
+		{
+			<option value="@item.CountryID">@item.CountryName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>City</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCity">
+		<option value="0">--Select City--</option>
+		@foreach (var item in cityModel)
+		{
+			<option value="@item.CityID">@item.CityName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Address</label>
+	<br />
+	<input type="text" @bind-value="orgModel.OrgAddress" placeholder="Enter Address" />
+	<br />
+	<br />
+	<label>Logo</label>
+	<br />
+	@if (imageUrl != null)
+	{
+		<img id="imgLogo" src="@imageUrl" />
+	}
+	<InputFile OnChange="HandleFileSelect"></InputFile>
+	<br />
+	<br />
+	<div class="form-group">
+		<label>Is Active?</label>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="true" checked="@orgModel.OrgIsActive" @onchange="e => orgModel.OrgIsActive = true" />
+			<label class="form-check-label">Yes</label>
+		</div>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="false" checked="@(!orgModel.OrgIsActive)" @onchange="e => orgModel.OrgIsActive = false" />
+			<label class="form-check-label">No</label>
+		</div>
+	</div>
+	<br />
+	<br />
 	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
 </EditForm>
@@ -40,14 +92,27 @@
 
 	[Parameter]
 	public string? OrgID { get; set; }
-	public string? ButtonName { get; set; }
-	private List<OrgModel>? orgData { get; set; }
 
+	public string? ButtonName { get; set; }
+	public string? imageUrl { get; set; }
+	public byte[]? buffer { get; set; }
+
+	private List<OrgModel>? orgData { get; set; }
 	private OrgModel orgModel { get; set; } = new OrgModel();
+
+	private List<CountryModel> countryModel { get; set; } = new List<CountryModel>();
+	private int country { get; set; }
+
+
+	private List<CityModel> cityModel { get; set; } = new List<CityModel>();
+	private int city { get; set; }
 
 
 	protected override void OnInitialized()
 	{
+		LoadCountry();
+		LoadCity();
+
 		if (!string.IsNullOrEmpty(OrgID))
 		{
 			ButtonName = "Edit";
@@ -56,9 +121,14 @@
 			{
 				orgModel.OrgID = item.OrgID;
 				orgModel.OrgName = item.OrgName;
-				orgModel.OrgAddress = item.OrgAddress;
 				orgModel.OrgPhoneNo = item.OrgPhoneNo;
 				orgModel.OrgEmail = item.OrgEmail;
+				orgModel.CountryID = item.CountryID;
+				orgModel.CityID = item.CityID;
+				orgModel.OrgAddress = item.OrgAddress;
+				orgModel.OrgLogo = item.OrgLogo;
+				orgModel.OrgIsActive = item.OrgIsActive;
+				imageUrl = item.OrgLogo;
 			}
 		}
 		else
@@ -67,22 +137,53 @@
 		}
 	}
 
+	private void GetCountry(ChangeEventArgs e)
+	{
+		country = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCountry()
+	{
+		countryModel = CountryDAL.GetCountry();
+	}
+
+	private void GetCity(ChangeEventArgs e)
+	{
+		city = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCity()
+	{
+		cityModel = CityDAL.GetCity();
+	}
 
 	private void SaveOrg()
 	{
 		if (ButtonName == "Save")
 		{
-			if (OrgDAL.SaveOrg(orgModel) == 1)
+			if (country > 0 && city > 0)
 			{
-				nm.NavigateTo("org/organizations");
+				orgModel.CountryID = country;
+				orgModel.CityID = city;
+				orgModel.OrgLogo = imageUrl;
+				if (OrgDAL.SaveOrg(orgModel) == 1)
+				{
+					nm.NavigateTo("org/organizations");
+				}
 			}
 		}
 		else
 		{
-			orgModel.OrgID = int.Parse(OrgID);
-			if (OrgDAL.EditOrg(orgModel) == 1)
+			if (country > 0 && city > 0)
 			{
-				nm.NavigateTo("org/organizations");
+				orgModel.OrgID = int.Parse(OrgID);
+				orgModel.CountryID = country;
+				orgModel.CityID = city;
+				orgModel.OrgLogo = imageUrl;
+				if (OrgDAL.EditOrg(orgModel) == 1)
+				{
+					nm.NavigateTo("org/organizations");
+				}
 			}
 		}
 	}
@@ -91,6 +192,19 @@
 	{
 		orgData=OrgDAL.GetOrgByID(int.Parse(OrgID));
 	}
+
+	private async Task HandleFileSelect(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		if (file != null)
+		{
+			using var stream = file.OpenReadStream();
+			buffer = new byte[file.Size];
+			await stream.ReadAsync(buffer, 0, (int)file.Size);
+
+			imageUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+			orgModel.OrgLogo = imageUrl;
+		}
+	}
+
 }
-
-

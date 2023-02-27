@@ -1,0 +1,129 @@
+﻿@page "/usr/addnewusr"
+@page "/usr/addnewusr/{UserID}"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+@inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>Add New User</h3>
+
+<br />
+<EditForm Model="usrModel" OnSubmit="SaveUser">
+
+	<br />
+	<label>Email</label>
+	<br />
+	<input type="text" @bind-value="usrModel.UserEmail" placeholder="Enter Email" />
+	<br />
+	<br />
+	<label>Password</label>
+	<br />
+	<input type="text" @bind-value="usrModel.UserPassword" placeholder="Enter Password" />
+	<br />
+	<br />
+	<label>Role</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetRoles">
+		<option value="0">--Select Role--</option>
+		@foreach (var item in rlModel)
+		{
+			<option value="@item.RoleID">@item.RoleName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<div class="form-group">
+		<label>Is Active?</label>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="true" checked="@usrModel.UserIsActive" @onchange="e => usrModel.UserIsActive = true" />
+			<label class="form-check-label">Yes</label>
+		</div>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="false" checked="@(!usrModel.UserIsActive)" @onchange="e => usrModel.UserIsActive = false" />
+			<label class="form-check-label">No</label>
+		</div>
+	</div>
+	<br />
+	<br />
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
+
+</EditForm>
+<br />
+
+@code {
+	[Parameter]
+	public string? UserID { get; set; }
+
+	public string? ButtonName { get; set; }
+
+	private List<UserModel>? usrData { get; set; }
+	private UserModel usrModel { get; set; } = new UserModel();
+
+	private List<RoleModel> rlModel { get; set; } = new List<RoleModel>();
+	private int roles { get; set; }
+
+	protected override void OnInitialized()
+	{
+		LoadRoles();
+
+		if (!string.IsNullOrEmpty(UserID))
+		{
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in usrData)
+			{
+				usrModel.UserID = item.UserID;
+				usrModel.UserEmail = item.UserEmail;
+				usrModel.UserPassword = item.UserPassword;
+				usrModel.RoleID = item.RoleID;
+				usrModel.UserIsActive = item.UserIsActive;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
+		}
+	}
+
+	private void GetRoles(ChangeEventArgs e)
+	{
+		roles = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadRoles()
+	{
+		rlModel = RoleDAL.GetRoles();
+	}
+
+	private void SaveUser()
+	{
+		if (ButtonName == "Save")
+		{
+			if (roles > 0)
+			{
+				usrModel.RoleID = roles;
+				if (UserDAL.SaveUser(usrModel) == 1)
+				{
+					nm.NavigateTo("usr/user");
+				}
+			}
+		}
+		else
+		{
+			if (roles > 0)
+			{
+				usrModel.UserID = int.Parse(UserID);
+				usrModel.RoleID = roles;
+				if (UserDAL.EditUser(usrModel) == 1)
+				{
+					nm.NavigateTo("usr/user");
+				}
+			}
+		}
+	}
+
+	private void GetData()
+	{
+		usrData = UserDAL.GetUserByID(int.Parse(UserID));
+	}
+}

@@ -17,6 +17,7 @@ namespace ClassLibraryDAL
 			SqlCommand cmd = new SqlCommand("Sp_SaveQual", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 			cmd.Parameters.AddWithValue("@QualTitle", qm.QualTitle);
+			cmd.Parameters.AddWithValue("@QualIsActive", qm.QualIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
@@ -36,6 +37,7 @@ namespace ClassLibraryDAL
 				QualModel qual = new QualModel();
 				qual.QualID = int.Parse(sdr["QualID"].ToString());
 				qual.QualTitle = sdr["QualTitle"].ToString();
+				qual.QualIsActive = bool.Parse(sdr["QualIsActive"].ToString());
 				Quallist.Add(qual);
 			}
 			con.Close();
@@ -56,7 +58,8 @@ namespace ClassLibraryDAL
             {
                 QualModel qual = new QualModel();
                 qual.QualTitle = sdr["QualTitle"].ToString();
-                Quallist.Add(qual);
+				qual.QualIsActive = bool.Parse(sdr["QualIsActive"].ToString());
+				Quallist.Add(qual);
             }
             con.Close();
             return Quallist;
@@ -70,6 +73,7 @@ namespace ClassLibraryDAL
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 			cmd.Parameters.AddWithValue("@QualID", qm.QualID);
 			cmd.Parameters.AddWithValue("@QualTitle", qm.QualTitle);
+			cmd.Parameters.AddWithValue("@QualIsActive", qm.QualIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

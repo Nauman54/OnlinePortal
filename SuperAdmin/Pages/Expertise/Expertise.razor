@@ -1,10 +1,11 @@
 ﻿@page "/exp/expertise"
 @using ClassLibraryDAL
 @using ClassLibraryModel
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>Expertise</h3>
 <br />
-<a href="exp/addnewexp" class="btn btn-outline-primary btn-sm">Add New Expertise</a>
+<a href="exp/addnewexp" class="btn btn-outline-primary btn-sm">Add Expertise</a>
 <br />
 <br />
 
@@ -14,6 +15,7 @@
 			<th>Sr#</th>
 			<th>Title</th>
 			<th>Abbreviation</th>
+			<th>Active</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -23,6 +25,7 @@
 			<td>@item.ExpID</td>
 			<td>@item.ExpTitle</td>
 			<td>@item.Abbreviation</td>
+			<td>@item.ExpIsActive</td>
 			<td>
 				<a href="exp/addnewexp/@item.ExpID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"

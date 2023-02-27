@@ -17,6 +17,7 @@ namespace ClassLibraryDAL
 			SqlCommand cmd = new SqlCommand("Sp_SavePos", con);
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 			cmd.Parameters.AddWithValue("@PosTitle", pm.PosTitle);
+			cmd.Parameters.AddWithValue("@PosIsActive", pm.PosIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
@@ -36,6 +37,7 @@ namespace ClassLibraryDAL
 				PosModel pos = new PosModel();
 				pos.PosID = int.Parse(sdr["PosID"].ToString());
 				pos.PosTitle = sdr["PosTitle"].ToString();
+				pos.PosIsActive = bool.Parse(sdr["PosIsActive"].ToString());
 				Poslist.Add(pos);
 			}
 			con.Close();
@@ -56,7 +58,8 @@ namespace ClassLibraryDAL
             {
                 PosModel pos = new PosModel();
                 pos.PosTitle = sdr["PosTitle"].ToString();
-                Poslist.Add(pos);
+				pos.PosIsActive = bool.Parse(sdr["PosIsActive"].ToString());
+				Poslist.Add(pos);
             }
             con.Close();
             return Poslist;
@@ -70,6 +73,7 @@ namespace ClassLibraryDAL
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 			cmd.Parameters.AddWithValue("@PosID", pm.PosID);
 			cmd.Parameters.AddWithValue("@PosTitle", pm.PosTitle);
+			cmd.Parameters.AddWithValue("@PosIsActive", pm.PosIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

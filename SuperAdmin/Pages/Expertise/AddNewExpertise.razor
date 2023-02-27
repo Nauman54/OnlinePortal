@@ -3,6 +3,7 @@
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>AddNewExpertise</h3>
 
@@ -19,6 +20,17 @@
 	<br />
 	<input type="text" @bind-value="expModel.Abbreviation" placeholder="Enter Abbreviation" />
 	<br />
+	<label>Is Active</label>
+	<br />
+	<div>
+		<input type="radio" id="true" name="expModel.ExpIsActive" @bind="expModel.ExpIsActive" checked>
+		<label for="true">Active</label>
+	</div>
+	<div>
+		<input type="radio" id="false" name="expModel.ExpIsActive" @bind="expModel.ExpIsActive">
+		<label for="false">Inactive</label>
+	</div>
+	<br />
 	<br />
 	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 
@@ -29,9 +41,10 @@
 
 	[Parameter]
 	public string? ExpID { get; set; }
-	public string? ButtonName { get; set; }
-	private List<ExpModel>? expData { get; set; }
 
+	public string? ButtonName { get; set; }
+
+	private List<ExpModel>? expData { get; set; }
 	private ExpModel expModel { get; set; } = new ExpModel();
 
 	protected override void OnInitialized()
@@ -45,11 +58,13 @@
 				expModel.ExpID = item.ExpID;
 				expModel.ExpTitle = item.ExpTitle;
 				expModel.Abbreviation = item.Abbreviation;
+				expModel.ExpIsActive = item.ExpIsActive;
 			}
 		}
 		else
 		{
 			ButtonName = "Save";
+			expModel.ExpIsActive = true;
 		}
 	}
 
@@ -65,7 +80,7 @@
 		else
 		{
 			expModel.ExpID = int.Parse(ExpID);
-			if (ExpDAL.SaveExp(expModel) == 1)
+			if (ExpDAL.EditExp(expModel) == 1)
 			{
 				nm.NavigateTo("exp/expertise");
 			}

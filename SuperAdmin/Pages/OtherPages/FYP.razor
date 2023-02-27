@@ -1,0 +1,150 @@
+﻿@page "/others/fyp"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>FYP</h3>
+<br />
+
+<style>
+
+	#MyEditFormInput1 {
+		margin-left: 20px;
+	}
+
+	#MyEditFormButton1 {
+		margin-left: 5px;
+	}
+
+	#MyCancelBtn {
+		margin-left: 350px
+	}
+
+</style>
+
+<EditForm Model="fpModel" OnSubmit="SaveFYP">
+	<div>
+		<label>FYP</label>
+		<input type="text" id="MyEditFormInput1" @bind-value="fpModel.FYPTitle" placeholder="Enter FYP" />
+		<button type="submit" id="MyEditFormButton1" class="btn btn-outline-primary btn-sm">@ButtonName</button>
+	</div>
+</EditForm>
+<button class="btn btn-outline-danger btn-sm" id="MyCancelBtn" @onclick="AddFYP">Cancel</button>
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Gender</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in fypData)
+	{
+			<tr>
+				<td>@item.FYPID</td>
+				<td>@item.FYPTitle</td>
+				<td>
+					<button class="btn btn-outline-primary btn-sm"
+					@onclick="(()=>EditFYP(item.FYPID))">
+						Edit
+					</button>
+					<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>ConfirmDelete(item.FYPID))">
+						Delete
+					</button>
+				</td>
+			</tr>
+	}
+</table>
+
+
+
+@code {
+
+	private List<FYPModel> fypData { get; set; } = new List<FYPModel>();
+	private List<FYPModel> fpData { get; set; }
+
+	public string? ButtonName { get; set; }
+
+	public int fypID { get; set; }
+
+	private FYPModel fypModel { get; set; } = new FYPModel();
+	private FYPModel fpModel { get; set; } = new FYPModel();
+
+	protected override void OnInitialized()
+	{
+		LoadFYP();
+		ButtonName = "Save";
+	}
+
+	private void LoadFYP()
+	{
+		fypData = FYPDAL.GetFYP();
+	}
+
+	private async Task ConfirmDelete(int FaclID)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+		if (confirmed)
+		{
+			DeleteFYP(FaclID);
+		}
+	}
+
+	private void DeleteFYP(int FYPID)
+	{
+		if (FYPDAL.DeleteFYP(FYPID) == 1)
+		{
+			LoadFYP();
+		}
+	}
+
+	private void EditFYP(int FYPID)
+	{
+		ButtonName = "Edit";
+		fypID = FYPID;
+		GetData();
+		foreach (var item in fpData)
+		{
+			fpModel.FYPID = item.FYPID;
+			fpModel.FYPTitle = item.FYPTitle;
+		}
+	}
+
+	private void SaveFYP()
+	{
+		if (ButtonName == "Save")
+		{
+			if (FYPDAL.SaveFYP(fpModel) == 1)
+			{
+				LoadFYP();
+			}
+			fpModel.FYPTitle = "";
+		}
+		else
+		{
+			fpModel.FYPID = fypID;
+			if (FYPDAL.EditFYP(fpModel) == 1)
+			{
+				LoadFYP();
+			}
+			ButtonName = "Save";
+			fpModel.FYPTitle = "";
+		}
+	}
+
+	private void GetData()
+	{
+		fpData = FYPDAL.GetFYPByID(fypID);
+	}
+
+	private void AddFYP()
+	{
+		fpModel.FYPTitle = "";
+		ButtonName = "Save";
+	}
+
+}

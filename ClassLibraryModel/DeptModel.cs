@@ -11,5 +11,8 @@ namespace ClassLibraryModel
 		public int DeptID { get; set; }
 		public string? DeptName { get; set; }
 		public int OrgID { get; set; }
+		public bool? DeptIsActive { get; set; }
+
+		public string? OrgName { get; set; }
 	}
 }

@@ -10,5 +10,6 @@ namespace ClassLibraryModel
 	{
 		public int QualID { get; set; }
 		public string? QualTitle { get; set; }
+		public bool? QualIsActive { get; set; }
 	}
 }

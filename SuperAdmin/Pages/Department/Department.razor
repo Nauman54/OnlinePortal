@@ -1,12 +1,17 @@
 ﻿@page "/dept/department"
 @using ClassLibraryDAL
 @using ClassLibraryModel
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
+
+@using SuperAdmin.Data
 
 <h3>Departments</h3>
 
 <br />
-<a href="dept/addnewdepartment" class="btn btn-outline-primary btn-sm">Add New Department</a>
+<a href="dept/addnewdepartment" class="btn btn-outline-primary btn-sm">Add Department</a>
 <br />
+
 <br />
 <table class="table table-bordered">
 	<thead>
@@ -14,6 +19,7 @@
 			<th>Sr#</th>
 			<th>Name</th>
 			<th>Organization</th>
+			<th>IsActive</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -22,14 +28,14 @@
 		<tr>
 			<td>@item.DeptID</td>
 			<td>@item.DeptName</td>
-			<td>@item.OrgID</td>
+			<td>@item.OrgName</td>
+			<td>@item.DeptIsActive</td>
 			<td>
 				<a href="dept/addnewdepartment/@item.DeptID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"
-					@onclick="(()=>DeleteDept(item.DeptID))">
+					@onclick="(()=>ConfirmDelete(item.DeptID))">
 					Delete
 				</button>
-				<a href="facl/addnewfacl" class="btn btn-outline-primary btn-sm">Add Faculty</a>
 			</td>
 		</tr>
 	}
@@ -47,6 +53,15 @@
 	private void LoadDept()
 	{
 		deptData = DeptDAL.GetDept();
+	}
+
+	private async Task ConfirmDelete(int DeptID)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+		if (confirmed)
+		{
+			DeleteDept(DeptID);
+		}
 	}
 
 	private void DeleteDept(int DeptID)

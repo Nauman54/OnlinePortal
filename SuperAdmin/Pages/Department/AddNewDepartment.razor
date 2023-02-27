@@ -3,6 +3,7 @@
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>Add New Department</h3>
 <br />
@@ -15,17 +16,28 @@
 	<input type="text" @bind-value="deptModel.DeptName" placeholder="Enter Department Name" />
 	<br />
 	<br />
-	@*<input type="text" @bind-value="deptModel.OrgID" placeholder="Enter Organization ID" />
-	<br />*@
 	<label>Organization</label>
 	<br />
 	<select class="form-control-sm" @onchange="GetOrganizations">
 		<option value="0">--Select Organization--</option>
-		@foreach (var item in orgModels)
+		@foreach (var item in orgModel)
 		{
 			<option value="@item.OrgID">@item.OrgName</option>
 		}
 	</select>
+	<br />
+	<br />
+	<div class="form-group">
+		<label>Is Active?</label>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="true" checked="@deptModel.DeptIsActive" @onchange="e => deptModel.DeptIsActive = true" />
+			<label class="form-check-label">Yes</label>
+		</div>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="false" checked="@(!deptModel.DeptIsActive)" @onchange="e => deptModel.DeptIsActive = false" />
+			<label class="form-check-label">No</label>
+		</div>
+	</div>
 	<br />
 	<br />
 	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
@@ -37,12 +49,13 @@
 
 	[Parameter]
 	public string? DeptID { get; set; }
-	public string? ButtonName { get; set; }
-	private List<DeptModel>? deptData { get; set; }
 
+	public string? ButtonName { get; set; }
+
+	private List<DeptModel>? deptData { get; set; }
 	private DeptModel deptModel { get; set; } = new DeptModel();
 
-	private List<OrgModel> orgModels { get; set; } = new List<OrgModel>();
+	private List<OrgModel> orgModel { get; set; } = new List<OrgModel>();
 	private int organization { get; set; }
 
 	protected override void OnInitialized()
@@ -58,6 +71,7 @@
 				deptModel.DeptID = item.DeptID;
 				deptModel.DeptName = item.DeptName;
 				deptModel.OrgID = item.OrgID;
+				deptModel.DeptIsActive = item.DeptIsActive;
 			}
 		}
 		else
@@ -73,7 +87,7 @@
 
 	private void LoadOrganizations()
 	{
-		orgModels = OrgDAL.GetOrg();
+		orgModel = OrgDAL.GetOrg();
 	}
 
 	private void SaveDept()
@@ -93,8 +107,8 @@
 		{
 			if (organization > 0)
 			{
-				deptModel.OrgID = organization;
 				deptModel.DeptID = int.Parse(DeptID);
+				deptModel.OrgID = organization;
 				if (DeptDAL.EditDept(deptModel) == 1)
 				{
 					nm.NavigateTo("dept/department");

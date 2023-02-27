@@ -1,44 +1,48 @@
 ﻿@page "/org/organizations"
 @using ClassLibraryDAL
 @using ClassLibraryModel
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>Organizations</h3>
 
+<style>
+	#imgLogo{
+		width:90px;
+		height:90px;
+	}
+</style>
+
 <br />
-<a href="org/addneworg" class="btn btn-outline-primary btn-sm">Add New Organization</a>
+<a href="org/addneworg" class="btn btn-outline-primary btn-sm">Add Organization</a>
 <br />
 <br />
-<table class="table table-bordered">
-	<thead>
-		<tr>
-			<th>Sr#</th>
-			<th>Name</th>
-			<th>Address</th>
-			<th>Phone No</th>
-			<th>Email</th>
-			<th>Action</th>
-		</tr>
-	</thead>
+<div class="row row-cols-1 row-cols-md-2 g-4">
 	@foreach (var item in orgData)
 	{
-		<tr>
-			<td>@item.OrgID</td>
-			<td>@item.OrgName</td>
-			<td>@item.OrgAddress</td>
-			<td>@item.OrgPhoneNo</td>
-			<td>@item.OrgEmail</td>
-			<td>
-				<a href="org/addneworg/@item.OrgID" class="btn btn-outline-primary btn-sm">Edit</a>
-				<button class="btn btn-outline-danger btn-sm"
-					@onclick="(()=>DeleteOrg(item.OrgID))">
-					Delete
-				</button>
-				<a href="dept/addnewdepartment" class="btn btn-outline-primary btn-sm">Add Department</a>
-			</td>
-		</tr>
+		<div class="col">
+			<div class="card h-100">
+				<div class="card-body">
+					<p class="card-text">Organization ID: @item.OrgID</p>
+					<h5 class="card-title">@item.OrgName</h5>
+					<h6 class="card-title">Phone No: @item.OrgPhoneNo</h6>
+					<h6 class="card-title">Email: @item.OrgEmail</h6>
+					<h6 class="card-title">Country: @item.CountryName</h6>
+					<h6 class="card-title">City: @item.CityName</h6>
+					<h6 class="card-title">Address: @item.OrgAddress</h6>
+					<img class="card-title" id="imgLogo" src="@item.OrgLogo" />
+					<h6 class="card-title">Active: @item.OrgIsActive</h6>
+				</div>
+				<div class="card-footer">
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<a href="org/addneworg/@item.OrgID" class="btn btn-outline-primary me-md-2 mb-2 mb-md-0">Edit</a>
+						<button class="btn btn-outline-danger" @onclick="(()=>ConfirmDelete(item.OrgID))">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	}
-</table>
-
+</div>
 
 
 @code {
@@ -53,6 +57,15 @@
 	private void LoadOrg()
 	{
 		orgData = OrgDAL.GetOrg();
+	}
+
+	private async Task ConfirmDelete(int OrgID)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+		if (confirmed)
+		{
+			DeleteOrg(OrgID);
+		}
 	}
 
 	private void DeleteOrg(int OrgID)

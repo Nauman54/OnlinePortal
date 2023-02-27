@@ -1,0 +1,138 @@
+﻿@page "/others/country"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>Country</h3>
+
+<style>
+
+	#MyEditFormInput1 {
+		margin-left: 20px;
+	}
+
+	#MyEditFormButton1 {
+		margin-left: 5px;
+	}
+
+	#MyCancelBtn {
+		margin-left: 350px
+	}
+
+</style>
+
+<br />
+<EditForm Model="ctryModel" OnSubmit="SaveCountry">
+	<div>
+		<label>Country</label>
+		<input type="text" id="MyEditFormInput1" @bind-value="ctryModel.CountryName" placeholder="Enter Country" />
+		<button type="submit" id="MyEditFormButton1" class="btn btn-outline-primary btn-sm">@ButtonName</button>
+	</div>
+</EditForm>
+<button class="btn btn-outline-danger btn-sm" id="MyCancelBtn" @onclick="AddCountry">Cancel</button>
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Country</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in countryData)
+	{
+		<tr>
+			<td>@item.CountryID</td>
+			<td>@item.CountryName</td>
+			<td>
+				<button class="btn btn-outline-primary btn-sm"
+					@onclick="(()=>EditCountry(item.CountryID))">
+					Edit
+				</button>
+				<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteCountry(item.CountryID))">
+					Delete
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+
+@code {
+	private List<CountryModel> countryData { get; set; } = new List<CountryModel>();
+
+	public string? ButtonName { get; set; }
+
+	public int countryID { get; set; }
+	private List<CountryModel> ctryData { get; set; }
+
+	private CountryModel countryModel { get; set; } = new CountryModel();
+	private CountryModel ctryModel { get; set; } = new CountryModel();
+
+	protected override void OnInitialized()
+	{
+		LoadCountry();
+		ButtonName = "Save";
+	}
+
+	private void LoadCountry()
+	{
+		countryData = CountryDAL.GetCountry();
+	}
+
+	private void DeleteCountry(int CountryID)
+	{
+		if (CountryDAL.DeleteCountry(CountryID) == 1)
+		{
+			LoadCountry();
+		}
+	}
+
+	private void EditCountry(int CountryID)
+	{
+		ButtonName = "Edit";
+		countryID = CountryID;
+		GetData();
+		foreach (var item in ctryData)
+		{
+			ctryModel.CountryID = item.CountryID;
+			ctryModel.CountryName = item.CountryName;
+		}
+	}
+
+	private void SaveCountry()
+	{
+		if (ButtonName == "Save")
+		{
+			if (CountryDAL.SaveCountry(ctryModel) == 1)
+			{
+				LoadCountry();
+			}
+			ctryModel.CountryName = "";
+		}
+		else
+		{
+			ctryModel.CountryID = countryID;
+			if (CountryDAL.EditCountry(ctryModel) == 1)
+			{
+				LoadCountry();
+			}
+			ButtonName = "Save";
+			ctryModel.CountryName = "";
+		}
+	}
+
+	private void GetData()
+	{
+		ctryData = CountryDAL.GetCountryByID(countryID);
+	}
+
+	private void AddCountry()
+	{
+		ctryModel.CountryName = "";
+		ButtonName = "Save";
+	}
+
+}

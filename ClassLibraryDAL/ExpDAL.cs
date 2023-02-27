@@ -18,6 +18,7 @@ namespace ClassLibraryDAL
 			cmd.CommandType = System.Data.CommandType.StoredProcedure;
 			cmd.Parameters.AddWithValue("@ExpTitle", em.ExpTitle);
 			cmd.Parameters.AddWithValue("@Abbreviation", em.Abbreviation);
+			cmd.Parameters.AddWithValue("@ExpIsActive", em.ExpIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;
@@ -38,6 +39,7 @@ namespace ClassLibraryDAL
 				exp.ExpID = int.Parse(sdr["ExpID"].ToString());
 				exp.ExpTitle = sdr["ExpTitle"].ToString();
 				exp.Abbreviation = sdr["Abbreviation"].ToString();
+				exp.ExpIsActive = bool.Parse(sdr["ExpIsActive"].ToString());
 				Explist.Add(exp);
 			}
 			con.Close();
@@ -59,7 +61,8 @@ namespace ClassLibraryDAL
                 ExpModel exp = new ExpModel();
                 exp.ExpTitle = sdr["ExpTitle"].ToString();
                 exp.Abbreviation = sdr["Abbreviation"].ToString();
-                Explist.Add(exp);
+				exp.ExpIsActive = bool.Parse(sdr["ExpIsActive"].ToString());
+				Explist.Add(exp);
             }
             con.Close();
             return Explist;
@@ -74,6 +77,7 @@ namespace ClassLibraryDAL
 			cmd.Parameters.AddWithValue("@ExpID", em.ExpID);
 			cmd.Parameters.AddWithValue("@ExpTitle", em.ExpTitle);
 			cmd.Parameters.AddWithValue("@Abbreviation", em.Abbreviation);
+			cmd.Parameters.AddWithValue("@ExpIsActive", em.ExpIsActive);
 			int i = cmd.ExecuteNonQuery();
 			con.Close();
 			return i;

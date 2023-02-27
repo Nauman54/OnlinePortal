@@ -1,11 +1,12 @@
 ﻿@page "/qual/qualifications"
 @using ClassLibraryDAL
 @using ClassLibraryModel
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>Qualifications</h3>
 
 <br />
-<a href="qual/addnewqual" class="btn btn-outline-primary btn-sm">Add New Qualification</a>
+<a href="qual/addnewqual" class="btn btn-outline-primary btn-sm">Add Qualification</a>
 <br />
 <br />
 
@@ -14,6 +15,7 @@
 		<tr>
 			<th>Sr#</th>
 			<th>Title</th>
+			<th>Active</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -22,6 +24,7 @@
 		<tr>
 			<td>@item.QualID</td>
 			<td>@item.QualTitle</td>
+			<td>@item.QualIsActive</td>
 			<td>
 				<a href="qual/addnewqual/@item.QualID" class="btn btn-outline-primary btn-sm">Edit</a>
 				<button class="btn btn-outline-danger btn-sm"

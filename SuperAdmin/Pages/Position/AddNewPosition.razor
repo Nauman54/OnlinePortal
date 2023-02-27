@@ -3,6 +3,7 @@
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>AddNewPosition</h3>
 
@@ -12,6 +13,17 @@
 	<label>Title</label>
 	<br />
 	<input type="text" @bind-value="posModel.PosTitle" placeholder="Enter Position Title" />
+	<br />
+	<label>Is Active</label>
+	<br />
+	<div>
+		<input type="radio" id="true" name="posModel.PosIsActive" @bind="posModel.PosIsActive" checked>
+		<label for="true">Active</label>
+	</div>
+	<div>
+		<input type="radio" id="false" name="posModel.PosIsActive" @bind="posModel.PosIsActive">
+		<label for="false">Inactive</label>
+	</div>
 	<br />
 	<br />
 	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
@@ -23,9 +35,10 @@
 
 	[Parameter]
 	public string? PosID { get; set; }
-	public string? ButtonName { get; set; }
-	private List<PosModel>? posData { get; set; }
 
+	public string? ButtonName { get; set; }
+
+	private List<PosModel>? posData { get; set; }
 	private PosModel posModel { get; set; } = new PosModel();
 
 	protected override void OnInitialized()
@@ -38,11 +51,13 @@
 			{
 				posModel.PosID = item.PosID;
 				posModel.PosTitle = item.PosTitle;
+				posModel.PosIsActive = item.PosIsActive;
 			}
 		}
 		else
 		{
 			ButtonName = "Save";
+			posModel.PosIsActive = true;
 		}
 	}
 
@@ -58,7 +73,7 @@
 		else
 		{
 			posModel.PosID = int.Parse(PosID);
-			if (PosDAL.SavePos(posModel) == 1)
+			if (PosDAL.EditPos(posModel) == 1)
 			{
 				nm.NavigateTo("pos/positions");
 			}
@@ -71,4 +86,7 @@
 		posData = PosDAL.GetPosByID(int.Parse(PosID));
 	}
 
+
 }
+
+

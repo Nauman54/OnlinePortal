@@ -1,0 +1,81 @@
+﻿@page "/login"
+@using SuperAdmin.Authentication
+@layout AuthLayout
+@inject UserAccountService userAccountService
+@inject AuthenticationStateProvider authStateProvider
+@inject IJSRuntime JS
+@inject NavigationManager nm
+
+<!-- Section: Design Block -->
+<section class="background-radial-gradient overflow-hidden">
+    
+    <div class="container px-4 py-5 px-md-5 text-center text-lg-start my-5">
+        <div class="row gx-lg-5 align-items-center mb-5">
+            <div class="col-lg-6 mb-5 mb-lg-0" style="z-index: 10">
+                <h1 class="my-5 display-5 fw-bold ls-tight" style="color: hsl(218, 81%, 95%)">
+                    Air <br />
+                    <span style="color: hsl(218, 81%, 75%)">University</span>
+                </h1>
+                <p class="mb-4 opacity-70" style="color: hsl(218, 81%, 85%)">
+                    FInal Year Project (FYP) Portal
+                </p>
+            </div>
+
+            <div class="col-lg-6 mb-5 mb-lg-0 position-relative">
+                <div id="radius-shape-1" class="position-absolute rounded-circle shadow-5-strong"></div>
+                <div id="radius-shape-2" class="position-absolute shadow-5-strong"></div>
+
+                <div class="card bg-glass">
+                    <div class="card-body px-4 py-5 px-md-5">
+                        <form>
+                            <!-- Email input -->
+                            <div class="form-outline mb-4">
+                                <label class="form-label" for="form3Example3">Username</label>
+                                <input @bind="model.Email" type="text" id="form3Example3" class="form-control" placeholder="Enter Email"/>
+                            </div>
+
+                            <!-- Password input -->
+                            <div class="form-outline mb-4">
+                                <label class="form-label" for="form3Example4">Password</label>
+                                <input @bind="model.Password" type="password" id="form3Example4" class="form-control" placeholder="Enter Password" />
+                            </div>
+
+                            <!-- Submit button -->
+                            <button type="submit" class="btn btn-primary btn-block mb-4" @onclick="Authenticate">Login</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Section: Design Block -->
+
+@code {
+
+    private class Model
+    {
+        public string? Email { get; set; }
+        public string? Password { get; set; }
+    }
+
+    private Model model = new Model();
+
+    private async Task Authenticate()
+    {
+        var userAccount = userAccountService.GetByUserEmail(model.Email);
+        if(userAccount == null || userAccount.UserPassword != model.Password)
+        {
+            await JS.InvokeVoidAsync("alert", "Invalid Email or Password");
+            return;
+        }
+
+        var customAuthStateProvider = (CustomAuthenticationStateProvider) authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(new UserSession
+            {
+                UserEmail = userAccount.UserEmail,
+                Role = userAccount.Role
+            });
+        nm.NavigateTo("/", true);
+    }
+}

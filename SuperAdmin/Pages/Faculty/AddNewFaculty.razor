@@ -3,6 +3,7 @@
 @using ClassLibraryModel
 @using ClassLibraryDAL
 @inject NavigationManager nm
+@attribute [Authorize(Roles = "Administrator")]
 
 <h3>AddNewFaculty</h3>
 
@@ -19,6 +20,22 @@
 	<input type="text" @bind-value="faclModel.FaclLastName" placeholder="Enter Last Name" />
 	<br />
 	<br />
+	<label>Gender</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetGender">
+		<option value="0">--Select Gender--</option>
+		@foreach (var item in genModels)
+		{
+			<option value="@item.GenderID">@item.GenderName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>CNIC</label>
+	<br />
+	<input type="text" @bind-value="faclModel.FaclCNIC" placeholder="Enter CNIC" />
+	<br />
+	<br />
 	<label>Phone Number</label>
 	<br />
 	<input type="text" @bind-value="faclModel.FaclPhoneNo" placeholder="Enter Phone No" />
@@ -29,9 +46,41 @@
 	<input type="text" @bind-value="faclModel.FaclEmail" placeholder="Enter Email" />
 	<br />
 	<br />
+	<label>Country</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCountry">
+		<option value="0">--Select Country--</option>
+		@foreach (var item in ctryModels)
+		{
+			<option value="@item.CountryID">@item.CountryName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>City</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCity">
+		<option value="0">--Select City--</option>
+		@foreach (var item in ctyModels)
+		{
+			<option value="@item.CityID">@item.CityName</option>
+		}
+	</select>
+	<br />
+	<br />
 	<label>Address</label>
 	<br />
 	<input type="text" @bind-value="faclModel.FaclAddress" placeholder="Enter Address" />
+	<br />
+	<br />
+	<label>Last Job</label>
+	<br />
+	<input type="text" @bind-value="faclModel.FaclLastJob" placeholder="Enter Last Job" />
+	<br />
+	<br />
+	<label>Experience</label>
+	<br />
+	<input type="text" @bind-value="faclModel.FaclExperience" placeholder="Enter Experience" />
 	<br />
 	<br />
 	<label>Position</label>
@@ -41,17 +90,6 @@
 		@foreach (var item in posModels)
 		{
 			<option value="@item.PosID">@item.PosTitle</option>
-		}
-	</select>
-	<br />
-	<br />
-	<label>Expertise</label>
-	<br />
-	<select class="form-control-sm" @onchange="GetExpertise">
-		<option value="0">--Select Expertise--</option>
-		@foreach (var item in expModels)
-		{
-			<option value="@item.ExpID">@item.ExpTitle</option>
 		}
 	</select>
 	<br />
@@ -67,17 +105,6 @@
 	</select>
 	<br />
 	<br />
-	<label>Department</label>
-	<br />
-	<select class="form-control-sm" @onchange="GetDepartments">
-		<option value="0">--Select Department--</option>
-		@foreach (var item in deptModels)
-		{
-			<option value="@item.DeptID">@item.DeptName</option>
-		}
-	</select>
-	<br />
-	<br />
 	<label>Organization</label>
 	<br />
 	<select class="form-control-sm" @onchange="GetOrganizations">
@@ -89,7 +116,35 @@
 	</select>
 	<br />
 	<br />
-	
+	<label>Department</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetDepartments">
+		<option value="0">--Select Department--</option>
+		@foreach (var item in deptModels)
+		{
+			<option value="@item.DeptID">@item.DeptName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Image</label>
+	<br />
+	<input type="text" @bind-value="faclModel.FaclImage" placeholder="Enter Image" />
+	<br />
+	<br />
+	<label>Is Active</label>
+	<br />
+	<div>
+		<input type="radio" id="true" name="faclModel.FaclIsActive" @bind="faclModel.FaclIsActive" checked>
+		<label for="true">Active</label>
+	</div>
+	<div>
+		<input type="radio" id="false" name="faclModel.FaclIsActive" @bind="faclModel.FaclIsActive">
+		<label for="false">Inactive</label>
+	</div>
+	<br />
+	<br />
+
 	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
 	<br />
 </EditForm>
@@ -98,10 +153,21 @@
 
 	[Parameter]
 	public string? FaclID { get; set; }
-	public string? ButtonName { get; set; }
-	private List<FaclModel>? faclData { get; set; }
 
+	public string? ButtonName { get; set; }
+	public string? imageSource { get; set; }
+
+	private List<FaclModel>? faclData { get; set; }
 	private FaclModel faclModel { get; set; } = new FaclModel();
+
+	private List<GenderModel> genModels { get; set; } = new List<GenderModel>();
+	private int gender { get; set; }
+
+	private List<CountryModel> ctryModels { get; set; } = new List<CountryModel>();
+	private int country { get; set; }
+
+	private List<CityModel> ctyModels { get; set; } = new List<CityModel>();
+	private int city { get; set; }
 
 	private List<PosModel> posModels { get; set; } = new List<PosModel>();
 	private int position { get; set; }
@@ -120,11 +186,13 @@
 
 	protected override void OnInitialized()
 	{
+		LoadGender();
+		LoadCountry();
+		LoadCity();
 		LoadPostions();
-		LoadExpertise();
 		LoadQualifications();
-		LoadDepartments();
 		LoadOrganizations();
+		LoadDepartments();
 
 		if (!string.IsNullOrEmpty(FaclID))
 		{
@@ -135,20 +203,58 @@
 				faclModel.FaclID = item.FaclID;
 				faclModel.FaclFirstName = item.FaclFirstName;
 				faclModel.FaclLastName = item.FaclLastName;
+				faclModel.GenderID = item.GenderID;
+				faclModel.FaclCNIC = item.FaclCNIC;
 				faclModel.FaclPhoneNo = item.FaclPhoneNo;
 				faclModel.FaclEmail = item.FaclEmail;
+				faclModel.CountryID = item.CountryID;
+				faclModel.CityID = item.CityID;
 				faclModel.FaclAddress = item.FaclAddress;
+				faclModel.FaclLastJob = item.FaclLastJob;
+				faclModel.FaclExperience = item.FaclExperience;
 				faclModel.PosID = item.PosID;
-				faclModel.ExpID = item.ExpID;
 				faclModel.QualID = item.QualID;
-				faclModel.DeptID = item.DeptID;
 				faclModel.OrgID = item.OrgID;
+				faclModel.DeptID = item.DeptID;
+				faclModel.FaclImage = item.FaclImage;
+				faclModel.FaclIsActive = item.FaclIsActive;
 			}
 		}
 		else
 		{
 			ButtonName = "Save";
+			faclModel.FaclIsActive = true;
 		}
+	}
+
+	private void GetGender(ChangeEventArgs e)
+	{
+		gender = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadGender()
+	{
+		genModels = GenderDAL.GetGender();
+	}
+
+	private void GetCountry(ChangeEventArgs e)
+	{
+		country = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCountry()
+	{
+		ctryModels = CountryDAL.GetCountry();
+	}
+
+	private void GetCity(ChangeEventArgs e)
+	{
+		city = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCity()
+	{
+		ctyModels = CityDAL.GetCity();
 	}
 
 	private void GetPositions(ChangeEventArgs e)
@@ -181,6 +287,17 @@
 		qualModels = QualDAL.GetQual();
 	}
 
+	private void GetOrganizations(ChangeEventArgs e)
+	{
+		organization = int.Parse(e.Value.ToString());
+		LoadDepartments();
+	}
+
+	private void LoadOrganizations()
+	{
+		orgModels = OrgDAL.GetOrg();
+	}
+
 	private void GetDepartments(ChangeEventArgs e)
 	{
 		department = int.Parse(e.Value.ToString());
@@ -188,17 +305,7 @@
 
 	private void LoadDepartments()
 	{
-		deptModels = DeptDAL.GetDept();
-	}
-
-	private void GetOrganizations(ChangeEventArgs e)
-	{
-		organization = int.Parse(e.Value.ToString());
-	}
-
-	private void LoadOrganizations()
-	{
-		orgModels = OrgDAL.GetOrg();
+		deptModels = DeptDAL.GetDeptByOrg(organization);
 	}
 
 	private void SaveFacl()
@@ -207,11 +314,14 @@
 		{
 			if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
 			{
+				faclModel.GenderID = gender;
+				faclModel.CountryID = country;
+				faclModel.CityID = city;
 				faclModel.PosID = position;
-				faclModel.ExpID = expertise;
 				faclModel.QualID = qualification;
-				faclModel.DeptID = department;
 				faclModel.OrgID = organization;
+				faclModel.DeptID = department;
+				faclModel.FaclImage = imageSource;
 				if (FaclDAL.SaveFacl(faclModel) == 1)
 				{
 					nm.NavigateTo("facl/faculty");
@@ -223,11 +333,14 @@
 			if (position > 0 && expertise > 0 && qualification > 0 && department > 0 && organization > 0)
 			{
 				faclModel.FaclID = int.Parse(FaclID);
+				faclModel.GenderID = gender;
+				faclModel.CountryID = country;
+				faclModel.CityID = city;
 				faclModel.PosID = position;
-				faclModel.ExpID = expertise;
 				faclModel.QualID = qualification;
-				faclModel.DeptID = department;
 				faclModel.OrgID = organization;
+				faclModel.DeptID = department;
+				faclModel.FaclImage = imageSource;
 				if (FaclDAL.EditFacl(faclModel) == 1)
 				{
 					nm.NavigateTo("facl/faculty");
@@ -239,6 +352,12 @@
 	private void GetData()
 	{
 		faclData = FaclDAL.GetFaclByID(int.Parse(FaclID));
+	}
+
+
+	private void LoadImage()
+	{
+		imageSource = $"Images/naumanProfilePicture.jpg";
 	}
 
 }

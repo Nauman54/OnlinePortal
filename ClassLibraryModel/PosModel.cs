@@ -10,5 +10,6 @@ namespace ClassLibraryModel
 	{
 		public int PosID { get; set; }
 		public string? PosTitle { get; set; }
+		public bool? PosIsActive { get; set; }
 	}
 }

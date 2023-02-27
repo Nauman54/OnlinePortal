@@ -1,0 +1,62 @@
+﻿@page "/usr/user"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@attribute [Authorize(Roles = "Administrator")]
+
+<h3>User</h3>
+<br />
+<a href="usr/addnewusr" class="btn btn-outline-primary btn-sm">Add User</a>
+<br />
+<br />
+
+<table class="table table-bordered">
+	<thead>
+		<tr>
+			<th>Sr#</th>
+			<th>Email</th>
+			<th>Password</th>
+			<th>Role</th>
+			<th>Active</th>
+			<th>Action</th>
+		</tr>
+	</thead>
+	@foreach (var item in usrData)
+	{
+		<tr>
+			<td>@item.UserID</td>
+			<td>@item.UserEmail</td>
+			<td>@item.UserPassword</td>
+			<td>@item.RoleName</td>
+			<td>@item.UserIsActive</td>
+			<td>
+				<a href="usr/addnewusr/@item.UserID" class="btn btn-outline-primary btn-sm">Edit</a>
+				<button class="btn btn-outline-danger btn-sm"
+					@onclick="(()=>DeleteUser(item.UserID))">
+					Delete
+				</button>
+			</td>
+		</tr>
+	}
+</table>
+
+@code {
+	private List<UserModel> usrData { get; set; } = new List<UserModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadUser();
+	}
+
+	private void LoadUser()
+	{
+		usrData = UserDAL.GetUser();
+	}
+
+	private void DeleteUser(int UserID)
+	{
+		if (UserDAL.DeleteUser(UserID) == 1)
+		{
+			LoadUser();
+		}
+	}
+}
