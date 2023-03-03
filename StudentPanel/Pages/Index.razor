@@ -1,9 +1,54 @@
 ﻿@page "/"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Index</PageTitle>
 
-<h1>Hello, world!</h1>
+<AuthorizeView>
+    <Authorized>
+        @foreach (var item in stdData)
+        {
+            <h1>
+                Hello, @item.StdFirstName @item.StdLastName
+            </h1>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <h1>Hello, Guest!</h1>
+    </NotAuthorized>
+</AuthorizeView>
 
-Welcome to your new app.
+<br />
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+<h3>Welcome to your new app.</h3>
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationState { get; set; }
+
+    private string? email;
+    private string? name;
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+    private List<StdModel> stdData { get; set; } = new List<StdModel>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            claims = user.Claims;
+            email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+            LoadStd(email);
+        }
+    }
+
+    private void LoadStd(string email)
+    {
+        stdData = StdDAL.GetStdByEmail(email);
+    }
+}

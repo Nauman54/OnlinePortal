@@ -6,4 +6,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ClassLibraryDAL\ClassLibraryDAL.csproj" />
+    <ProjectReference Include="..\ClassLibraryModel\ClassLibraryModel.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -141,12 +141,6 @@ RoleID int foreign key references Roles(RoleID),
 UserIsActive bit null
 )
 
-insert into Users(UserEmail,UserPassword,RoleID,UserIsActive)
-values ('nauman@gmail.com','nauman','1','true');
-
-select * from Users
-
-
 create table Student
 (
 StdID int primary key identity (1,1) not null,
@@ -162,8 +156,27 @@ StdAddress nvarchar(max),
 StdLastEducation nvarchar(50) null,
 OrgID int foreign key references Organization(OrgID),
 DeptID int foreign key references Department(DeptID),
-FaclImage nvarchar(max) null,
+StdImage nvarchar(max) null,
 StdIsActive bit null
+)
+
+
+create table StudentGroup
+(
+SgID int primary key identity (1,1) not null,
+SgName nvarchar(50),
+StdID int unique foreign key references Student(StdID),
+SgIsActive bit
+)
+
+
+create table StudentGroupMembers
+(
+SgmID int primary key identity (1,1) not null,
+StdID int unique foreign key references Student(StdID),
+SgID int foreign key references StudentGroup(SgID),
+SgIsLeader bit,
+SgmIsActive binary
 )
 
 create table Projects
@@ -174,13 +187,6 @@ ProjDetails nvarchar(max),
 FaclID int foreign key references Faculty(FaclID)
 )
 
-create table StudentGroup
-(
-SgID int primary key identity (1,1) not null,
-ProjID int foreign key references Projects(ProjID),
-DeptID int foreign key references Department(DeptID),
-SgIsActive bit
-)
 
 create table FypStatus
 (
@@ -192,14 +198,6 @@ ProjEndDate DateTime,
 FYPStatusIsActive bit
 )
 
-create table StudentGroupMembers
-(
-SgmID int primary key identity (1,1) not null,
-StdID int unique foreign key references Student(StdID),
-SgID int foreign key references StudentGroup(SgID),
-SgIsLeader bit,
-SgmIsActive binary
-)
 
 create table Supervisor
 (
@@ -282,6 +280,14 @@ as
 begin
 select * from City
 where CityID = @CityID
+end
+
+create proc Sp_GetCityByCountry
+@CountryID int
+as 
+begin
+select * from City
+where CountryID = @CountryID
 end
 
 create procedure Sp_EditCity
@@ -830,6 +836,7 @@ select * from Users
 where UserID = @UserID
 end
 
+
 create procedure Sp_EditUser
 @UserID int,
 @UserEmail nvarchar(50),
@@ -848,6 +855,100 @@ create proc Sp_DeleteUser
 as 
 begin
 delete from Users where UserID = @UserID
+end
+
+
+
+
+create proc Sp_SaveStd
+@StdFirstName varchar(50),
+@StdLastName varchar(50),
+@GenderID int,
+@StdCNIC nvarchar(15),
+@StdPhoneNo nvarchar(20),
+@StdEmail nvarchar(50),
+@CountryID int,
+@CityID int,
+@StdAddress nvarchar(max),
+@StdLastEducation nvarchar(max) null,
+@OrgID int,
+@DeptID int,
+@StdImage nvarchar(max) null,
+@StdIsActive bit null
+as
+begin
+insert into Student(StdFirstName, StdLastName, GenderID, StdCNIC, StdPhoneNo, StdEmail, CountryID, CityID, 
+	StdAddress, StdLastEducation, OrgID, DeptID, StdImage, StdIsActive) 
+values (@StdFirstName, @StdLastName, @GenderID, @StdCNIC, @StdPhoneNo, @StdEmail, @CountryID, @CityID, 
+	@StdAddress, @StdLastEducation, @OrgID, @DeptID, @StdImage, @StdIsActive) 
+end
+
+
+create view vWGetStd
+as
+select StdID, StdFirstName, StdLastName, gen.GenderName, StdCNIC, StdPhoneNo, StdEmail, ctry.CountryName, cty.CityName, 
+	StdAddress, StdLastEducation, org.OrgName, dept.DeptName, StdImage, StdIsActive
+from Student as std
+join Gender as gen on std.GenderID = gen.GenderID
+join Country as ctry on std.CountryID = ctry.CountryID
+join City as cty on std.CityID = cty.CityID
+join Organization as org on std.OrgID = org.OrgID
+join Department as dept on std.DeptID = dept.DeptID
+
+
+create proc Sp_GetStd
+as 
+begin
+select * from vWGetStd
+end
+
+create proc Sp_GetStdByID
+@StdID int
+as 
+begin
+select * from Student
+where StdID = @StdID
+end
+
+create proc Sp_GetStdByEmail
+@StdEmail nvarchar(50)
+as 
+begin
+select * from Student
+where StdEmail = @StdEmail
+end
+
+create procedure Sp_EditStd
+@StdID int,
+@StdFirstName varchar(50),
+@StdLastName varchar(50),
+@GenderID int,
+@StdCNIC nvarchar(15),
+@StdPhoneNo nvarchar(20),
+@StdEmail nvarchar(50),
+@CountryID int,
+@CityID int,
+@StdAddress nvarchar(max),
+@StdLastEducation nvarchar(max) null,
+@OrgID int,
+@DeptID int,
+@StdImage nvarchar(max) null,
+@StdIsActive bit null
+as 
+begin
+update Student
+set StdFirstName = @StdFirstName, StdLastName = @StdLastName, GenderID = @GenderID, StdCNIC = @StdCNIC, 
+	StdPhoneNo = @StdPhoneNo, StdEmail = @StdEmail, CountryID = @CountryID, CityID = @CityID, StdAddress = @StdAddress, 
+	StdLastEducation = @StdLastEducation, OrgID = @OrgID,
+	DeptID = @DeptID, StdImage = @StdImage, StdIsActive = @StdIsActive
+where StdID = @StdID
+end
+
+create proc Sp_DeleteStd
+@StdID int
+as 
+begin
+delete from Student where StdID=@StdID
 end
 
 

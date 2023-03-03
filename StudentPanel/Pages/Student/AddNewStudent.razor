@@ -1,0 +1,312 @@
+﻿@page "/std/addnewstd"
+@page "/std/addnewstd/{StdID}"
+@using ClassLibraryModel
+@using ClassLibraryDAL
+@inject NavigationManager nm
+@attribute [Authorize(Roles = "Student")]
+
+<h3>Add New Student</h3>
+
+<style>
+	#imgstyle {
+		width: 90px;
+		height: 90px;
+	}
+</style>
+
+<br />
+<EditForm Model="stdModel" OnSubmit="SaveStd">
+	<br />
+	<label>First Name</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdFirstName" placeholder="Enter First Name" />
+	<br />
+	<br />
+	<label>Last Name</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdLastName" placeholder="Enter Last Name" />
+	<br />
+	<br />
+	<label>Gender</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetGender">
+		<option value="0">--Select Gender--</option>
+		@foreach (var item in genModels)
+		{
+			<option value="@item.GenderID">@item.GenderName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>CNIC</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdCNIC" placeholder="Enter CNIC" />
+	<br />
+	<br />
+	<label>Phone Number</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdPhoneNo" placeholder="Enter Phone No" />
+	<br />
+	<br />
+	<label>Email</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdEmail" placeholder="Enter Email" />
+	<br />
+	<br />
+	<label>Country</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCountry">
+		<option value="0">--Select Country--</option>
+		@foreach (var item in ctryModels)
+		{
+			<option value="@item.CountryID">@item.CountryName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>City</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetCity">
+		<option value="0">--Select City--</option>
+		@foreach (var item in ctyModels)
+		{
+			<option value="@item.CityID">@item.CityName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Address</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdAddress" placeholder="Enter Address" />
+	<br />
+	<br />
+	<label>Last Education</label>
+	<br />
+	<input type="text" @bind-value="stdModel.StdLastEducation" placeholder="Enter Last Education" />
+	<br />
+	<br />
+	<label>Organization</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetOrganizations">
+		<option value="0">--Select Organization--</option>
+		@foreach (var item in orgModels)
+		{
+			<option value="@item.OrgID">@item.OrgName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Department</label>
+	<br />
+	<select class="form-control-sm" @onchange="GetDepartments">
+		<option value="0">--Select Department--</option>
+		@foreach (var item in deptModels)
+		{
+			<option value="@item.DeptID">@item.DeptName</option>
+		}
+	</select>
+	<br />
+	<br />
+	<label>Logo</label>
+	<br />
+	@if (imageUrl != null)
+	{
+		<img id="imgstyle" src="@imageUrl" />
+	}
+	<InputFile OnChange="HandleFileSelect"></InputFile>
+	<br />
+	<br />
+	<div class="form-group">
+		<label>Is Active?</label>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="true" checked="@stdModel.StdIsActive" @onchange="e => stdModel.StdIsActive = true" />
+			<label class="form-check-label">Yes</label>
+		</div>
+		<div class="form-check">
+			<input class="form-check-input" type="radio" value="false" checked="@(!stdModel.StdIsActive)" @onchange="e => stdModel.StdIsActive = false" />
+			<label class="form-check-label">No</label>
+		</div>
+	</div>
+	<br />
+	<br />
+	<button type="submit" class="btn btn-outline-primary btn-sm">@ButtonName</button>
+	<br />
+
+</EditForm>
+
+@code {
+
+	[Parameter]
+	public string? StdID { get; set; }
+
+	public string? ButtonName { get; set; }
+	public byte[]? buffer { get; set; }
+	public string? imageUrl { get; set; }
+
+	private List<StdModel>? stdData { get; set; }
+	private StdModel stdModel { get; set; } = new StdModel();
+
+	private List<GenderModel> genModels { get; set; } = new List<GenderModel>();
+	private int gender { get; set; }
+
+	private List<CountryModel> ctryModels { get; set; } = new List<CountryModel>();
+	private int country { get; set; }
+
+	private List<CityModel> ctyModels { get; set; } = new List<CityModel>();
+	private int city { get; set; }
+
+	private List<DeptModel> deptModels { get; set; } = new List<DeptModel>();
+	private int department { get; set; }
+
+	private List<OrgModel> orgModels { get; set; } = new List<OrgModel>();
+	private int organization { get; set; }
+
+	protected override void OnInitialized()
+	{
+		LoadGender();
+		LoadCountry();
+		LoadCity();
+		LoadOrganizations();
+		LoadDepartments();
+
+		if (!string.IsNullOrEmpty(StdID))
+		{
+			ButtonName = "Edit";
+			GetData();
+			foreach (var item in stdData)
+			{
+				stdModel.StdID = item.StdID;
+				stdModel.StdFirstName = item.StdFirstName;
+				stdModel.StdLastName = item.StdLastName;
+				stdModel.GenderID = item.GenderID;
+				stdModel.StdCNIC = item.StdCNIC;
+				stdModel.StdPhoneNo = item.StdPhoneNo;
+				stdModel.StdEmail = item.StdEmail;
+				stdModel.CountryID = item.CountryID;
+				stdModel.CityID = item.CityID;
+				stdModel.StdAddress = item.StdAddress;
+				stdModel.StdLastEducation = item.StdLastEducation;
+				stdModel.OrgID = item.OrgID;
+				stdModel.DeptID = item.DeptID;
+				stdModel.StdImage = item.StdImage;
+				stdModel.StdIsActive = item.StdIsActive;
+				imageUrl = item.StdImage;
+			}
+		}
+		else
+		{
+			ButtonName = "Save";
+		}
+	}
+
+	private void GetGender(ChangeEventArgs e)
+	{
+		gender = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadGender()
+	{
+		genModels = GenderDAL.GetGender();
+	}
+
+	private void GetCountry(ChangeEventArgs e)
+	{
+		country = int.Parse(e.Value.ToString());
+		LoadCity();
+	}
+
+	private void LoadCountry()
+	{
+		ctryModels = CountryDAL.GetCountry();
+	}
+
+	private void GetCity(ChangeEventArgs e)
+	{
+		city = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadCity()
+	{
+		ctyModels = CityDAL.GetCityByCountry(country);
+	}
+
+	private void GetOrganizations(ChangeEventArgs e)
+	{
+		organization = int.Parse(e.Value.ToString());
+		LoadDepartments();
+	}
+
+	private void LoadOrganizations()
+	{
+		orgModels = OrgDAL.GetOrg();
+	}
+
+	private void GetDepartments(ChangeEventArgs e)
+	{
+		department = int.Parse(e.Value.ToString());
+	}
+
+	private void LoadDepartments()
+	{
+		deptModels = DeptDAL.GetDeptByOrg(organization);
+	}
+
+	private void SaveStd()
+	{
+		if (ButtonName == "Save")
+		{
+			if (gender > 0 && country > 0 && city > 0 && department > 0 && organization > 0)
+			{
+				stdModel.GenderID = gender;
+				stdModel.CountryID = country;
+				stdModel.CityID = city;
+				stdModel.OrgID = organization;
+				stdModel.DeptID = department;
+				stdModel.StdImage = imageUrl;
+
+				if (StdDAL.SaveStd(stdModel) == 1)
+				{
+					nm.NavigateTo("/std/student");
+				}
+			}
+		}
+		else
+		{
+			if (gender > 0 && country > 0 && city > 0 && department > 0 && organization > 0)
+			{
+				stdModel.StdID = int.Parse(StdID);
+				stdModel.GenderID = gender;
+				stdModel.CountryID = country;
+				stdModel.CityID = city;
+				stdModel.OrgID = organization;
+				stdModel.DeptID = department;
+				stdModel.StdImage = imageUrl;
+				if (StdDAL.EditStd(stdModel) == 1)
+				{
+					nm.NavigateTo("/std/student");
+				}
+			}
+		}
+	}
+
+	private void GetData()
+	{
+		stdData = StdDAL.GetStdByID(int.Parse(StdID));
+	}
+
+
+	private async Task HandleFileSelect(InputFileChangeEventArgs e)
+	{
+		var file = e.File;
+		if (file != null)
+		{
+			using var stream = file.OpenReadStream();
+			buffer = new byte[file.Size];
+			await stream.ReadAsync(buffer, 0, (int)file.Size);
+
+			imageUrl = $"data:image/png;base64,{Convert.ToBase64String(buffer)}";
+			stdModel.StdImage = imageUrl;
+		}
+
+	}
+}

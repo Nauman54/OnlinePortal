@@ -1,4 +1,7 @@
 ﻿@inherits LayoutComponentBase
+@using StudentPanel.Authentication;
+@inject AuthenticationStateProvider authStateProvider
+@inject NavigationManager nm
 
 <PageTitle>StudentPanel</PageTitle>
 
@@ -8,8 +11,16 @@
     </div>
 
     <main>
+
         <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+            <AuthorizeView>
+                <Authorized>
+                    <a @onclick="Logout" href="javascript:void(0)" class="btn btn-outline-primary btn-sm">Logout</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/login" class="btn btn-outline-primary btn-sm">Login</a>
+                </NotAuthorized>
+            </AuthorizeView>
         </div>
 
         <article class="content px-4">
@@ -17,3 +28,12 @@
         </article>
     </main>
 </div>
+
+@code {
+    private async Task Logout()
+    {
+        var customAuthStateProvider = (CustomAuthenticationStateProvider)authStateProvider;
+        await customAuthStateProvider.UpdateAuthenticationState(null);
+        nm.NavigateTo("/", true);
+    }
+}

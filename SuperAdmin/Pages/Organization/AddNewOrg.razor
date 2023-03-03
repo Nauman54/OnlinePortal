@@ -140,6 +140,7 @@
 	private void GetCountry(ChangeEventArgs e)
 	{
 		country = int.Parse(e.Value.ToString());
+		LoadCity();
 	}
 
 	private void LoadCountry()
@@ -154,7 +155,7 @@
 
 	private void LoadCity()
 	{
-		cityModel = CityDAL.GetCity();
+		cityModel = CityDAL.GetCityByCountry(country);
 	}
 
 	private void SaveOrg()

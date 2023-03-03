@@ -77,7 +77,6 @@ namespace ClassLibraryDAL
 				org.CityID = int.Parse(sdr["CityID"].ToString());
 				org.OrgAddress = sdr["OrgAddress"].ToString();
 				org.OrgLogo = sdr["OrgLogo"].ToString();
-				//org.OrgLogo = (byte[])sdr["OrgLogo"];
 				org.OrgIsActive = bool.Parse(sdr["OrgIsActive"].ToString());
 				Orglist.Add(org);
 			}

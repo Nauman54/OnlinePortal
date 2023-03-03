@@ -12,11 +12,13 @@
     </NotAuthorized>
 </AuthorizeView>
 
-<h1>Welcome to the App</h1>
+<br />
+
+
+<h3>Welcome to the App</h3>
 
 <AuthorizeView>
     <Authorized>
-        <br />
         <br />
         <button class="btn btn-outline-primary" @onclick="DisplayGreetingAlert">Display Greeting Alert</button>
     </Authorized>
@@ -32,5 +34,4 @@
         var message = $"Hello, {authState.User.Identity.Name}";
         await JS.InvokeVoidAsync("alert", message);
     }
-
 }

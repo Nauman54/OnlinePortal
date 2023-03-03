@@ -1,7 +1,87 @@
 ﻿@page "/std/student"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@inject IJSRuntime JSRuntime
+@attribute [Authorize(Roles = "Administrator")]
 
-<h3>Student</h3>
+<h3>Students</h3>
+
+<style>
+	#imgLogo {
+		width: 90px;
+		height: 90px;
+	}
+</style>
+
+<br />
+<a href="std/addnewstd" class="btn btn-outline-primary btn-sm">Add Student</a>
+<br />
+<br />
+<div class="row row-cols-1 row-cols-md-2 g-4">
+	@foreach (var item in stdData)
+	{
+		<div class="col">
+			<div class="card h-100">
+				<div class="card-body">
+					<p class="card-text">Student ID: @item.StdID</p>
+					<h5 class="card-title">
+						@item.StdFirstName
+						@item.StdLastName
+					</h5>
+					<h6 class="card-title">Gender: @item.GenderName</h6>
+					<h6 class="card-title">CNIC: @item.StdCNIC</h6>
+					<h6 class="card-title">Phone No: @item.StdPhoneNo</h6>
+					<h6 class="card-title">Email: @item.StdEmail</h6>
+					<h6 class="card-title">Country: @item.CountryName</h6>
+					<h6 class="card-title">City: @item.CityName</h6>
+					<h6 class="card-title">Address: @item.StdAddress</h6>
+					<h6 class="card-title">Last Education: @item.StdLastEducation</h6>
+					<h6 class="card-title">Organization: @item.OrgName</h6>
+					<h6 class="card-title">Department: @item.DeptName</h6>
+					<img class="card-title" id="imgLogo" src="@item.StdImage" />
+					<h6 class="card-title">Active: @item.StdIsActive</h6>
+				</div>
+				<div class="card-footer">
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<a href="std/addnewstd/@item.StdID" class="btn btn-outline-primary me-md-2 mb-2 mb-md-0">Edit</a>
+						<button class="btn btn-outline-danger" @onclick="(()=>ConfirmDelete(item.StdID))">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+
 
 @code {
+
+	private List<StdModel> stdData { get; set; } = new List<StdModel>();
+
+	protected override void OnInitialized()
+	{
+		LoadStd();
+	}
+
+	private void LoadStd()
+	{
+		stdData = StdDAL.GetStd();
+	}
+
+	private async Task ConfirmDelete(int StdID)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+		if (confirmed)
+		{
+			DeleteStd(StdID);
+		}
+	}
+
+	private void DeleteStd(int StdID)
+	{
+		if (StdDAL.DeleteStd(StdID) == 1)
+		{
+			LoadStd();
+		}
+	}
 
 }
