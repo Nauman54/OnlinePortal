@@ -32,10 +32,7 @@
 			<td>@item.DeptIsActive</td>
 			<td>
 				<a href="dept/addnewdepartment/@item.DeptID" class="btn btn-outline-primary btn-sm">Edit</a>
-				<button class="btn btn-outline-danger btn-sm"
-					@onclick="(()=>ConfirmDelete(item.DeptID))">
-					Delete
-				</button>
+				<button class="btn btn-outline-danger btn-sm" @onclick="(()=>ConfirmDelete(item.DeptID))">Delete</button>
 			</td>
 		</tr>
 	}

@@ -1,5 +1,83 @@
-﻿<h3>Group</h3>
+﻿@page "/stdgroup/group"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
+@attribute [Authorize(Roles = "Student")]
+
+<h3>Group</h3>
+
+<a href="stdgroup/addnewgroup" class="btn btn-outline-primary me-md-2 mb-2 mb-md-0">Create Group</a>
+<a href="stdgroup/joingroup" class="btn btn-outline-primary me-md-2 mb-2 mb-md-0">Join Group</a>
+
+<br />
+<br />
+<div class="row row-cols-1 row-cols-md-2 g-4">
+	@foreach (var item in stdgroupData)
+	{
+		<div class="col">
+			<div class="card h-100">
+				<div class="card-body">
+					<h6 class="card-title">Group ID: @item.SgID</h6>
+					<h5 class="card-title">@item.SgName</h5>
+					<h6 class="card-title">Student: @item.StdFirstName @item.StdLastName</h6>
+					<h6 class="card-title">Active: @item.SgIsActive</h6>
+				</div>
+				<div class="card-footer">
+					<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+						<a href="stdgroup/addnewgroup/@item.SgID" class="btn btn-outline-primary me-md-2 mb-2 mb-md-0">Edit</a>
+						<button class="btn btn-outline-danger btn-sm" @onclick="(()=>DeleteSGroup(item.SgID))">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+</div>
 
 @code {
+	private int Sid;
+	private string? email;
+	private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+	private List<StdModel> stdData { get; set; } = new List<StdModel>();
+	private List<StdGroupModel> stdgroupData { get; set; } = new List<StdGroupModel>();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		if (user.Identity is not null && user.Identity.IsAuthenticated)
+		{
+			claims = user.Claims;
+			email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+			stdData = StdDAL.GetStdByEmail(email);
+			foreach(var item in stdData)
+			{
+				Sid = item.StdID;
+			}
+			stdgroupData = StdGroupDAL.GetSGroupByStd(Sid);
+		}
+	}
+
+	@*
+	private async Task ConfirmDelete(int SgID)
+	{
+		bool confirmed = await JSRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this item?");
+		if (confirmed)
+		{
+			DeleteSGroup(SgID);
+		}
+	}
+	*@
+
+	private void DeleteSGroup(int SgID)
+	{
+		if (StdGroupDAL.DeleteSGroup(SgID) == 1)
+		{
+			stdgroupData = StdGroupDAL.GetSGroupByStd(SgID);
+		}
+	}
 
 }

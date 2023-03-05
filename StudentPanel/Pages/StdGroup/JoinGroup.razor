@@ -1,0 +1,85 @@
+﻿@page "/stdgroup/joingroup"
+@using ClassLibraryDAL
+@using ClassLibraryModel
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IJSRuntime JS
+@inject NavigationManager nm
+@attribute [Authorize(Roles = "Student")]
+
+<h3>JoinGroup</h3>
+
+
+
+@code {
+
+	[Parameter]
+	public string? SgID { get; set; }
+
+	public string? ButtonName { get; set; }
+	private int Sid;
+	private string? email;
+	private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+
+	private List<StdModel> stdData { get; set; } = new List<StdModel>();
+
+	private List<StdGroupModel> stdgroupData { get; set; } = new List<StdGroupModel>();
+	private StdGroupModel stdgroupModel { get; set; } = new StdGroupModel();
+
+	protected override async Task OnInitializedAsync()
+	{
+		var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+		var user = authState.User;
+
+		if (user.Identity is not null && user.Identity.IsAuthenticated)
+		{
+			claims = user.Claims;
+			email = user.FindFirst(c => c.Type == ClaimTypes.Email)?.Value;
+			stdData = StdDAL.GetStdByEmail(email);
+			foreach (var item in stdData)
+			{
+				Sid = item.StdID;
+			}
+			stdgroupData = StdGroupDAL.GetSGroupByStd(Sid);
+
+			if (!string.IsNullOrEmpty(SgID))
+			{
+				ButtonName = "Edit";
+				stdgroupData = StdGroupDAL.GetSGroupByID(int.Parse(SgID));
+				foreach (var item in stdgroupData)
+				{
+					stdgroupModel.SgID = item.SgID;
+					stdgroupModel.SgName = item.SgName;
+					stdgroupModel.StdID = item.StdID;
+					stdgroupModel.SgIsActive = item.SgIsActive;
+				}
+			}
+			else
+			{
+				ButtonName = "Save";
+			}
+		}
+	}
+
+	private void SaveStdGroup()
+	{
+		if (ButtonName == "Save")
+		{
+			stdgroupModel.StdID = Sid;
+			if (StdGroupDAL.SaveSGroup(stdgroupModel) == 1)
+			{
+				nm.NavigateTo("stdgroup/group");
+			}
+		}
+		else
+		{
+			stdgroupModel.SgID = int.Parse(SgID);
+			stdgroupModel.StdID = Sid;
+			if (StdGroupDAL.EditSGroup(stdgroupModel) == 1)
+			{
+				nm.NavigateTo("stdgroup/group");
+			}
+		}
+	}
+
+}

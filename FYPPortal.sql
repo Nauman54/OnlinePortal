@@ -166,7 +166,7 @@ create table StudentGroup
 SgID int primary key identity (1,1) not null,
 SgName nvarchar(50),
 StdID int unique foreign key references Student(StdID),
-SgIsActive bit
+SgIsActive bit null
 )
 
 
@@ -175,8 +175,8 @@ create table StudentGroupMembers
 SgmID int primary key identity (1,1) not null,
 StdID int unique foreign key references Student(StdID),
 SgID int foreign key references StudentGroup(SgID),
-SgIsLeader bit,
-SgmIsActive binary
+SgIsLeader bit null,
+SgmIsActive bit null
 )
 
 create table Projects
@@ -987,5 +987,69 @@ end
 
 --DELETE FROM Faculty
 --DBCC CHECKIDENT ('FYPPortal.dbo.Faculty', RESEED, 0)
+
+
+--create table StudentGroupMembers
+--(
+--SgmID int primary key identity (1,1) not null,
+--StdID int unique foreign key references Student(StdID),
+--SgID int foreign key references StudentGroup(SgID),
+--SgIsLeader bit null,
+--SgmIsActive bit null
+--)
+
+
+
+create proc Sp_SaveSGroup
+@SgName nvarchar(50),
+@StdID int,
+@SgIsActive bit null
+as
+begin
+insert into StudentGroup(SgName, StdID, SgIsActive) 
+values (@SgName, @StdID, @SgIsActive)
+end
+
+create view vWGetSGroup
+as
+select SgID, SgName, std.StdFirstName, std.StdLastName, SgIsActive
+from StudentGroup as sg
+join Student as std
+on sg.StdID = std.StdID
+
+
+create proc Sp_GetSGroup
+as 
+begin
+select * from vWGetSGroup
+end
+
+create proc Sp_GetSGroupByID
+@SgID int
+as 
+begin
+select * from StudentGroup
+where SgID = @SgID
+end
+
+
+create procedure Sp_EditSGroup
+@SgID int,
+@SgName nvarchar(50),
+@StdID int,
+@SgIsActive bit null
+as 
+begin
+update StudentGroup
+set SgName = @SgName, StdID = @StdID, SgIsActive = @SgIsActive
+where SgID = @SgID
+end
+
+create proc Sp_DeleteSGroup
+@SgID int
+as 
+begin
+delete from StudentGroup where SgID = @SgID
+end
 
 
